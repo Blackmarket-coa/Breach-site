@@ -1,95 +1,52 @@
 {
-  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "composite": false,
+    "strict": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "target": "ES2022",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
     "noEmit": true,
-  },
-  "references": [
-    {
-      "path": "./packages/admin-bar"
-    },
-    {
-      "path": "./packages/create-payload-app"
-    },
-    {
-      "path": "./packages/db-mongodb"
-    },
-    {
-      "path": "./packages/db-postgres"
-    },
-    {
-      "path": "./packages/drizzle"
-    },
-    {
-      "path": "./packages/graphql"
-    },
-    {
-      "path": "./packages/live-preview"
-    },
-    {
-      "path": "./packages/live-preview-react"
-    },
-    {
-      "path": "./packages/live-preview-vue"
-    },
-    {
-      "path": "./packages/kv-redis"
-    },
-    {
-      "path": "./packages/next"
-    },
-    {
-      "path": "./packages/payload"
-    },
-    {
-      "path": "./packages/plugin-cloud-storage"
-    },
-    {
-      "path": "./packages/storage-s3"
-    },
-    {
-      "path": "./packages/payload-cloud"
-    },
-    {
-      "path": "./packages/plugin-form-builder"
-    },
-    {
-      "path": "./packages/plugin-nested-docs"
-    },
-    {
-      "path": "./packages/plugin-redirects"
-    },
-    {
-      "path": "./packages/plugin-search"
-    },
-    {
-      "path": "./packages/plugin-seo"
-    },
-    {
-      "path": "./packages/plugin-import-export"
-    },
-    {
-      "path": "./packages/plugin-stripe"
-    },
-    {
-      "path": "./packages/plugin-multi-tenant"
-    },
-    {
-      "path": "./packages/richtext-lexical"
-    },
-    {
-      "path": "./packages/translations"
-    },
-    {
-      "path": "./packages/ui"
-    },
-    {
-      "path": "./packages/sdk"
+    "incremental": true,
+    "jsx": "react-jsx",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "isolatedModules": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@payload-config": [
+        "./src/payload.config.ts"
+      ],
+      "react": [
+        "./node_modules/@types/react"
+      ],
+      "@/*": [
+        "./src/*"
+      ]
     }
-  ],
+  },
   "include": [
-    "${configDir}/src",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts",
-    "./scripts/**/*.ts"
+    "redirects.js",
+    "next-env.d.ts",
+    "next.config.js",
+    "next-sitemap.config.cjs",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
