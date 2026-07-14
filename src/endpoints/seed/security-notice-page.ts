@@ -18,7 +18,7 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
       heading('h1', text('Notice of Data Security Incident')),
       paragraph(
         text(
-          'This notice is posted pursuant to N.C. Gen. Stat. § 75-65. Posted on [DATE]. Last updated [DATE].',
+          'This notice is posted by Arielle Cadet-King pursuant to N.C. Gen. Stat. § 75-65. Posted on [DATE]. Last updated [DATE].',
         ),
       ),
     ),

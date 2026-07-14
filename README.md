@@ -2,6 +2,8 @@
 
 A public incident response portal for communicating about a data security incident: the official security notice, ongoing investigation updates, FAQ, identity-theft/consumer-protection resources, and a secure contact channel for affected individuals.
 
+Website owner and operator: **Arielle Cadet-King**.
+
 Built with [Payload CMS](https://payloadcms.com) 3.x on Next.js, backed by Postgres (Supabase in production), and designed to sit behind Cloudflare (DNS, CDN, WAF, Turnstile).
 
 Based on the official Payload Website Template (v3.86.0).
