@@ -50,6 +50,9 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  // Set NEXT_OUTPUT=standalone for Docker builds (see Dockerfile); `next start`
+  // and Vercel deployments require the default output mode.
+  output: process.env.NEXT_OUTPUT === 'standalone' ? 'standalone' : undefined,
   headers: async () => [
     {
       source: '/(.*)',
