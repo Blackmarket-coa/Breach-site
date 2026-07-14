@@ -69,7 +69,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "4.5.2",
     "autoprefixer": "^10.4.19",
-    "eslint": "^9.16.0",
+    "eslint": "9.16.0",
     "eslint-config-next": "16.2.6",
     "jsdom": "28.0.0",
     "postcss": "^8.4.38",
@@ -84,12 +84,5 @@
   "engines": {
     "node": "^18.20.2 || >=20.9.0",
     "pnpm": "^9 || ^10 || ^11"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "esbuild",
-      "unrs-resolver"
-    ]
   }
 }
