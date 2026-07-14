@@ -39,5 +39,6 @@ export const update1: (args: Update1Args) => RequiredDataFromCollectionSlug<'pos
     title: 'Website Notice Published',
     description:
       'The official security incident notice is now available on this website. The investigation is ongoing.',
+    image: heroImage?.id,
   },
 })

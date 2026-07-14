@@ -22,6 +22,8 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
+    // Local default avatars — gravatar.com would violate the CSP img-src policy
+    avatar: 'default',
     importMap: {
       baseDir: path.resolve(dirname),
     },
