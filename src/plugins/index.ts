@@ -12,6 +12,7 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { auditFormSubmission } from '@/hooks/auditLog'
 import { verifyFormSubmission } from '@/hooks/verifyFormSubmission'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
@@ -61,6 +62,7 @@ export const plugins: Plugin[] = [
     },
     formSubmissionOverrides: {
       hooks: {
+        afterChange: [auditFormSubmission],
         beforeChange: [verifyFormSubmission],
       },
     },
