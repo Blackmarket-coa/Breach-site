@@ -14,6 +14,8 @@ type LogAuditArgs = {
 /**
  * Best-effort append to the audit-logs collection via the Local API.
  * Never throws — audit logging must not block the action being logged.
+ * Joins the request's transaction (via req) — a separate transaction would
+ * deadlock against row locks held by the request that triggered the hook.
  */
 export const logAudit = async ({
   action,
@@ -26,6 +28,7 @@ export const logAudit = async ({
   try {
     await payload.create({
       collection: 'audit-logs',
+      req,
       data: {
         action,
         detail,
