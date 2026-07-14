@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { resendAdapter } from '@payloadcms/email-resend'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -66,6 +67,14 @@ export default buildConfig({
   }),
   collections: [Pages, Posts, Media, Categories, Users, AuditLogs],
   cors: [getServerSideURL()].filter(Boolean),
+  // Without RESEND_API_KEY, Payload logs emails to the console (local dev)
+  email: process.env.RESEND_API_KEY
+    ? resendAdapter({
+        apiKey: process.env.RESEND_API_KEY,
+        defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'notifications@example.com',
+        defaultFromName: process.env.EMAIL_FROM_NAME || 'Incident Response Portal',
+      })
+    : undefined,
   globals: [Header, Footer],
   plugins,
   secret: process.env.PAYLOAD_SECRET,

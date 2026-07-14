@@ -1,8 +1,10 @@
 'use client'
 import type { FormFieldBlock, Form as FormType } from '@payloadcms/plugin-form-builder/types'
+import type { TurnstileInstance } from '@marsidev/react-turnstile'
 
+import { Turnstile } from '@marsidev/react-turnstile'
 import { useRouter } from 'next/navigation'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import RichText from '@/components/RichText'
 import { Button } from '@/components/ui/button'
@@ -10,6 +12,8 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import { fields } from './fields'
 import { getClientSideURL } from '@/utilities/getURL'
+
+const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 export type FormBlockType = {
   blockName?: string
@@ -44,6 +48,8 @@ export const FormBlock: React.FC<
   const [isLoading, setIsLoading] = useState(false)
   const [hasSubmitted, setHasSubmitted] = useState<boolean>()
   const [error, setError] = useState<{ message: string; status?: string } | undefined>()
+  const [turnstileToken, setTurnstileToken] = useState<null | string>(null)
+  const turnstileRef = useRef<TurnstileInstance>(null)
   const router = useRouter()
 
   const onSubmit = useCallback(
@@ -52,10 +58,16 @@ export const FormBlock: React.FC<
       const submitForm = async () => {
         setError(undefined)
 
-        const dataToSend = Object.entries(data).map(([name, value]) => ({
-          field: name,
-          value,
-        }))
+        const dataToSend: { field: string; value: unknown }[] = Object.entries(data).map(
+          ([name, value]) => ({
+            field: name,
+            value,
+          }),
+        )
+
+        if (turnstileToken) {
+          dataToSend.push({ field: 'cfTurnstileToken', value: turnstileToken })
+        }
 
         // delay loading indicator by 1s
         loadingTimerID = setTimeout(() => {
@@ -86,6 +98,10 @@ export const FormBlock: React.FC<
               status: res.status,
             })
 
+            // Turnstile tokens are single-use — issue a fresh one for the retry
+            setTurnstileToken(null)
+            turnstileRef.current?.reset()
+
             return
           }
 
@@ -105,12 +121,14 @@ export const FormBlock: React.FC<
           setError({
             message: 'Something went wrong.',
           })
+          setTurnstileToken(null)
+          turnstileRef.current?.reset()
         }
       }
 
       void submitForm()
     },
-    [router, formID, redirect, confirmationType],
+    [router, formID, redirect, confirmationType, turnstileToken],
   )
 
   return (
@@ -151,7 +169,24 @@ export const FormBlock: React.FC<
                   })}
               </div>
 
-              <Button form={formID} type="submit" variant="default">
+              {turnstileSiteKey && (
+                <Turnstile
+                  className="mb-6"
+                  onError={() => setTurnstileToken(null)}
+                  onExpire={() => setTurnstileToken(null)}
+                  onSuccess={setTurnstileToken}
+                  options={{ theme: 'auto' }}
+                  ref={turnstileRef}
+                  siteKey={turnstileSiteKey}
+                />
+              )}
+
+              <Button
+                disabled={Boolean(turnstileSiteKey) && !turnstileToken}
+                form={formID}
+                type="submit"
+                variant="default"
+              >
                 {submitButtonLabel}
               </Button>
             </form>
