@@ -75,8 +75,27 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full runbook: Supabase setup (inclu
 | `pnpm dev`             | Dev server                                 |
 | `pnpm build`           | Production build (+ sitemap)               |
 | `pnpm start`           | Serve the production build                 |
-| `pnpm lint`            | ESLint                                     |
+| `pnpm dev:prod`        | Clean build + serve, to test a prod build locally |
+| `pnpm lint` / `lint:fix` | ESLint                                   |
 | `pnpm generate:types`  | Regenerate `src/payload-types.ts`          |
+| `pnpm generate:importmap` | Regenerate Payload's admin import map   |
 | `pnpm migrate`         | Apply database migrations                  |
 | `pnpm migrate:create`  | Create a migration                         |
 | `pnpm test`            | Integration (Vitest) + e2e (Playwright)    |
+| `pnpm test:int`        | Integration tests only (Vitest)            |
+| `pnpm test:e2e`        | End-to-end tests only (Playwright)         |
+
+## Project structure
+
+| Path                  | Contents                                             |
+| --------------------- | ----------------------------------------------------- |
+| `src/collections`     | Payload collections (Pages, Updates, Media, Users, Form Submissions, etc.) |
+| `src/blocks`          | Layout building blocks used by the page/update editors |
+| `src/heros`           | Hero section variants                                  |
+| `src/access`          | Access-control functions for collections/globals       |
+| `src/endpoints`       | Custom REST endpoints (e.g. seed)                      |
+| `src/plugins`         | Payload plugin configuration                           |
+| `src/migrations`      | Committed database migrations                          |
+| `src/app`             | Next.js App Router routes (frontend + Payload admin)   |
+| `src/middleware.ts`   | Security headers, rate limiting                        |
+| `tests`               | Vitest integration tests and Playwright e2e tests      |
