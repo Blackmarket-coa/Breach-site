@@ -12,11 +12,12 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { SITE_NAME } from '@/utilities/siteMetadata'
 import { auditFormSubmission } from '@/hooks/auditLog'
 import { verifyFormSubmission } from '@/hooks/verifyFormSubmission'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+  return doc?.title ? `${doc.title} | ${SITE_NAME}` : SITE_NAME
 }
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {

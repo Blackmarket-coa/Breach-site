@@ -16,7 +16,7 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   emails: [
     {
       emailFrom: `"Incident Response Portal" <${process.env.EMAIL_FROM_ADDRESS || 'notifications@example.com'}>`,
-      emailTo: process.env.ADMIN_NOTIFICATION_EMAIL || 'thelizzardoverlordscaneatmy@proton.me',
+      emailTo: process.env.ADMIN_NOTIFICATION_EMAIL || 'admin@example.com',
       subject: 'New contact form submission',
       message: root(
         paragraph(text('A new message was submitted through the incident response portal:')),
