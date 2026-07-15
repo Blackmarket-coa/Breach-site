@@ -34,7 +34,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
+    // Invoke the Next binary directly rather than via `pnpm dev`: Playwright
+    // runs this command with NODE_OPTIONS=--import=tsx/esm inherited, and a
+    // nested pnpm under that loader fails trying to resolve a phantom
+    // .pnpmfile.mjs. Use the explicit bin path since Playwright does not put
+    // node_modules/.bin on PATH for the web-server command.
+    command: './node_modules/.bin/next dev',
     reuseExistingServer: true,
     url: 'http://localhost:3000',
   },
