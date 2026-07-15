@@ -61,6 +61,15 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Integration tests
+        run: pnpm test:int
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: pnpm test:e2e
+
   # Deployment is intentionally not wired up yet. Once hosting is provisioned
   # (see DEPLOYMENT.md), add a deploy job gated on the main branch, e.g.:
   #
