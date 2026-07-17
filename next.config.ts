@@ -7,6 +7,21 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
 
+// Fail fast on misconfigured builds: `next build` statically generates pages by
+// querying Payload, so these must be present at build time — otherwise the build
+// compiles for minutes and then dies in page-data collection with a minified
+// "missing secret key" error. See DEPLOYMENT.md → "Environment variable reference".
+if (process.argv.includes('build')) {
+  const missing = ['PAYLOAD_SECRET', 'DATABASE_URL'].filter((name) => !process.env[name])
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required build-time environment variable(s): ${missing.join(', ')}. ` +
+        'Set them in your deployment platform (e.g. Vercel Project Settings → ' +
+        'Environment Variables, or Fly build args) — see DEPLOYMENT.md.',
+    )
+  }
+}
+
 const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
