@@ -20,6 +20,24 @@ import { getServerSideURL } from './utilities/getURL'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+if (!process.env.PAYLOAD_SECRET) {
+  throw new Error(
+    'PAYLOAD_SECRET is not set. Payload needs it to sign auth tokens. ' +
+      'Generate one with `openssl rand -hex 32` and set it in the environment ' +
+      'for both build and runtime (locally: .env; on your host: e.g. Vercel ' +
+      'Project Settings → Environment Variables, or Fly build args + secrets). ' +
+      'See DEPLOYMENT.md → "Environment variable reference".',
+  )
+}
+
+if (!process.env.DATABASE_URL) {
+  throw new Error(
+    'DATABASE_URL is not set. `next build` statically generates pages by querying ' +
+      'Payload, so the database must be reachable at build time as well as runtime. ' +
+      'See DEPLOYMENT.md → "Environment variable reference".',
+  )
+}
+
 export default buildConfig({
   admin: {
     // Local default avatars — gravatar.com would violate the CSP img-src policy
@@ -55,7 +73,7 @@ export default buildConfig({
   editor: defaultLexical,
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: process.env.DATABASE_URL,
     },
     migrationDir: path.resolve(dirname, 'migrations'),
   }),

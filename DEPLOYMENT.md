@@ -45,6 +45,8 @@ End-to-end guide for taking this portal from repository to production behind Clo
 
 Any Docker host works; [Fly.io](https://fly.io) is the concrete example. (Alternative: deploy to Vercel with Cloudflare as DNS-only — but then Cloudflare WAF/rate-limiting does not sit in front, so prefer the proxied Docker setup.)
 
+> **Deploying to Vercel instead:** before the first deploy, add every variable from the [environment variable reference](#environment-variable-reference) in **Project Settings → Environment Variables** (Production scope). Vercel exposes the same variables to build and runtime, so one set covers both — but they must exist **before** you trigger a build. If a build fails with `missing secret key. A secret key is needed to secure Payload` (or the preflight error naming `PAYLOAD_SECRET` / `DATABASE_URL`), the variables are missing from the Vercel project — add them and redeploy.
+
 1. Install `flyctl`, then from the repo root:
 
    ```bash
