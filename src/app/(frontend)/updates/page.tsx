@@ -7,8 +7,11 @@ import React from 'react'
 import PageClient from './page.client'
 import { getPayloadClient } from '@/utilities/getPayloadClient'
 
-export const dynamic = 'force-static'
-export const revalidate = 600
+// Render on demand instead of prerendering at build time: this page lists posts
+// from Payload (Postgres), so prerendering would make `next build` depend on the
+// database being reachable from the build environment. Rendered (and CDN-cached)
+// at request time instead, keeping the build database-independent.
+export const dynamic = 'force-dynamic'
 
 export default async function Page() {
   const payload = await getPayloadClient()

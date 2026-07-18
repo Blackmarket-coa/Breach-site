@@ -74,6 +74,14 @@ export const isConnectionError = (error: unknown, depth = 0): boolean => {
   return false
 }
 
+/**
+ * True while `next build` is running (Next sets this phase env var for the build
+ * process). Used to scope build-time-only graceful degradation so runtime keeps
+ * its normal error behavior.
+ */
+export const isBuildPhase = (): boolean =>
+  process.env.NEXT_PHASE === 'phase-production-build'
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const positiveIntFromEnv = (name: string, fallback: number): number => {
