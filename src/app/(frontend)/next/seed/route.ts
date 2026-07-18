@@ -1,12 +1,12 @@
-import { createLocalReq, getPayload } from 'payload'
+import { createLocalReq } from 'payload'
 import { seed } from '@/endpoints/seed'
-import config from '@payload-config'
+import { getPayloadClient } from '@/utilities/getPayloadClient'
 import { headers } from 'next/headers'
 
 export const maxDuration = 60 // This function can run for a maximum of 60 seconds
 
 export async function POST(): Promise<Response> {
-  const payload = await getPayload({ config })
+  const payload = await getPayloadClient()
   const requestHeaders = await headers()
 
   // Authenticate by passing request headers

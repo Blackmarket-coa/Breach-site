@@ -1,11 +1,10 @@
 import type { PayloadRequest } from 'payload'
-import { getPayload } from 'payload'
 
 import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { NextRequest } from 'next/server'
 
-import configPromise from '@payload-config'
+import { getPayloadClient } from '@/utilities/getPayloadClient'
 
 export type PreviewSearchParams = {
   path: string
@@ -13,7 +12,7 @@ export type PreviewSearchParams = {
 }
 
 export async function GET(req: NextRequest): Promise<Response> {
-  const payload = await getPayload({ config: configPromise })
+  const payload = await getPayloadClient()
 
   const { searchParams } = new URL(req.url)
 

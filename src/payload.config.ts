@@ -74,6 +74,16 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL,
+      // Bound each connection attempt so a cold or unreachable database fails
+      // fast (the OS TCP timeout can otherwise hang for minutes) and the retry
+      // wrapper in src/utilities/getPayloadClient.ts can re-attempt promptly
+      // against a now-warm pool instead of stalling the whole build.
+      connectionTimeoutMillis: Number(process.env.PAYLOAD_DB_CONNECT_TIMEOUT_MS) || 10000,
+      // Keep sockets alive through NAT/pooler idle windows.
+      keepAlive: true,
+      // Supabase's connection pooler caps concurrent connections; a small pool
+      // is plenty for build-time static generation and serverless runtime.
+      max: Number(process.env.PAYLOAD_DB_POOL_MAX) || 10,
     },
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
