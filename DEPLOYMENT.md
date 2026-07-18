@@ -29,6 +29,18 @@ End-to-end guide for taking this portal from repository to production behind Clo
 
    Do **not** use the transaction-mode pooler (port 6543) — it breaks schema migrations (DDL) and long-lived connection assumptions.
 
+   > **Build fails with `cannot connect to Postgres … ETIMEDOUT`?** `next build`
+   > statically generates pages by querying the database, so it must be
+   > reachable from the build environment. The build retries transient
+   > connection failures with backoff (a cold Supabase instance/pooler often
+   > times out on the first attempt then succeeds), tunable via
+   > `PAYLOAD_DB_CONNECT_RETRIES` / `PAYLOAD_DB_CONNECT_TIMEOUT_MS`. If it still
+   > fails after the retries, the host is genuinely unreachable — usually the
+   > wrong `DATABASE_URL`: use the **session-mode pooler** hostname above
+   > (`...pooler.supabase.com:5432`, IPv4-reachable), **not** the direct
+   > `db.<project-ref>.supabase.co` endpoint, which is IPv6-only and times out
+   > from IPv4-only build environments (e.g. Vercel).
+
 3. **Required security step — disable the Data API for Payload's tables.** Supabase exposes the `public` schema through its auto-generated REST API (PostgREST) with the `anon` key. Payload owns its schema and does not use row-level security, so leaving this on would let anyone with the anon key read Payload's tables (including users and form submissions).
 
    Go to **Project Settings → API → Exposed schemas** and **remove `public`** from the list (this app never uses `supabase-js` or the Data API, so nothing breaks). Alternatively, enable RLS with no policies on every Payload table after each migration — removing the exposure is simpler and doesn't need repeating.
