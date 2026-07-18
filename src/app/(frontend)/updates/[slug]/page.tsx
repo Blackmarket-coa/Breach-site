@@ -11,27 +11,32 @@ import type { Post } from '@/payload-types'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { generateStaticParamsSafe } from '@/utilities/generateStaticParamsSafe'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
-export async function generateStaticParams() {
-  const payload = await getPayloadClient()
-  const posts = await payload.find({
-    collection: 'posts',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
-  })
+// Generate posts on demand when they are not prerendered at build time (e.g.
+// when the database was unreachable during the build — see generateStaticParams).
+export const dynamicParams = true
 
-  const params = posts.docs.map(({ slug }) => {
-    return { slug }
-  })
+export function generateStaticParams() {
+  return generateStaticParamsSafe('/updates/[slug]', async () => {
+    const payload = await getPayloadClient()
+    const posts = await payload.find({
+      collection: 'posts',
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      select: {
+        slug: true,
+      },
+    })
 
-  return params
+    return posts.docs.map(({ slug }) => {
+      return { slug }
+    })
+  })
 }
 
 type Args = {

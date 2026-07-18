@@ -50,7 +50,7 @@ const RETRYABLE_MESSAGES = [
   'econnrefused',
 ]
 
-const isRetryable = (error: unknown, depth = 0): boolean => {
+export const isConnectionError = (error: unknown, depth = 0): boolean => {
   if (!error || typeof error !== 'object' || depth > 8) return false
 
   const code = (error as { code?: unknown }).code
@@ -64,11 +64,11 @@ const isRetryable = (error: unknown, depth = 0): boolean => {
 
   // Walk wrapped/aggregate errors (Payload wraps the driver error; pg may nest).
   const cause = (error as { cause?: unknown }).cause
-  if (cause && cause !== error && isRetryable(cause, depth + 1)) return true
+  if (cause && cause !== error && isConnectionError(cause, depth + 1)) return true
 
   const aggregated = (error as { errors?: unknown }).errors
   if (Array.isArray(aggregated)) {
-    return aggregated.some((nested) => isRetryable(nested, depth + 1))
+    return aggregated.some((nested) => isConnectionError(nested, depth + 1))
   }
 
   return false
@@ -93,7 +93,7 @@ export const getPayloadClient = async (): Promise<Payload> => {
     } catch (error) {
       lastError = error
 
-      if (attempt >= maxAttempts || !isRetryable(error)) {
+      if (attempt >= maxAttempts || !isConnectionError(error)) {
         throw error
       }
 
