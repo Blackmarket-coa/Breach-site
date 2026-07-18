@@ -34,9 +34,17 @@ End-to-end guide for taking this portal from repository to production behind Clo
    > reachable from the build environment. The build retries transient
    > connection failures with backoff (a cold Supabase instance/pooler often
    > times out on the first attempt then succeeds), tunable via
-   > `PAYLOAD_DB_CONNECT_RETRIES` / `PAYLOAD_DB_CONNECT_TIMEOUT_MS`. If it still
-   > fails after the retries, the host is genuinely unreachable — usually the
-   > wrong `DATABASE_URL`: use the **session-mode pooler** hostname above
+   > `PAYLOAD_DB_CONNECT_RETRIES` / `PAYLOAD_DB_CONNECT_TIMEOUT_MS`.
+   >
+   > `generateStaticParams` degrades gracefully: if the database is still
+   > unreachable after those retries, the affected routes (`/[slug]`,
+   > `/updates/[slug]`, `/updates/page/[pageNumber]`) log a `[build] … database
+   > unreachable …` warning and skip build-time prerendering instead of aborting
+   > the whole build, and are generated on demand at first request. Those retry
+   > attempts also warm a cold pooler so the render phase usually connects. The
+   > **home page and archive index still render at build time**, so a genuinely
+   > unreachable database will still fail the build there — usually the wrong
+   > `DATABASE_URL`: use the **session-mode pooler** hostname above
    > (`...pooler.supabase.com:5432`, IPv4-reachable), **not** the direct
    > `db.<project-ref>.supabase.co` endpoint, which is IPv6-only and times out
    > from IPv4-only build environments (e.g. Vercel).

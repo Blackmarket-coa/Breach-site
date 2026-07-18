@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { type RequiredDataFromCollectionSlug } from 'payload'
 import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { generateStaticParamsSafe } from '@/utilities/generateStaticParamsSafe'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import { homeStatic } from '@/endpoints/seed/home-static'
@@ -13,28 +14,34 @@ import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
-export async function generateStaticParams() {
-  const payload = await getPayloadClient()
-  const pages = await payload.find({
-    collection: 'pages',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    select: {
-      slug: true,
-    },
+// Generate pages on demand when they are not prerendered at build time (e.g.
+// when the database was unreachable during the build — see generateStaticParams).
+export const dynamicParams = true
+
+export function generateStaticParams() {
+  return generateStaticParamsSafe('/[slug]', async () => {
+    const payload = await getPayloadClient()
+    const pages = await payload.find({
+      collection: 'pages',
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      select: {
+        slug: true,
+      },
+    })
+
+    return (
+      pages.docs
+        ?.filter((doc) => {
+          return doc.slug !== 'home'
+        })
+        .map(({ slug }) => {
+          return { slug }
+        }) ?? []
+    )
   })
-
-  const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== 'home'
-    })
-    .map(({ slug }) => {
-      return { slug }
-    })
-
-  return params
 }
 
 type Args = {
