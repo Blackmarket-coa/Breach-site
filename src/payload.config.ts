@@ -42,6 +42,10 @@ export default buildConfig({
   admin: {
     // Local default avatars — gravatar.com would violate the CSP img-src policy
     avatar: 'default',
+    components: {
+      // One-click database seeding from the dashboard (see BeforeDashboard).
+      beforeDashboard: ['@/components/BeforeDashboard'],
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },

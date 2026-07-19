@@ -33,6 +33,11 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 // instead. Files are still served through Payload's own route (same origin, so
 // no CSP img-src changes needed); the bucket can stay private. Without these
 // env vars — local dev and CI — media falls back to local disk unchanged.
+//
+// NOTE: this plugin (with clientUploads) registers an admin component
+// (S3ClientUploadHandler). The committed admin import map therefore MUST include
+// it, or the admin panel fails to render in production. Regenerate the import
+// map with the S3_* vars set: `S3_BUCKET=… … pnpm generate:importmap`.
 const s3StorageConfigured = Boolean(
   process.env.S3_BUCKET &&
     process.env.S3_REGION &&
