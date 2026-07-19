@@ -1,12 +1,12 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
+import { INCIDENT, contactChannelNodes } from './incident-details'
 import { bold, heading, link, paragraph, root, text } from './lexical'
 
 /**
- * Placeholder for the official security incident notice, structured around the
- * seven content elements required by N.C. Gen. Stat. § 75-65(d). Every
- * [BRACKETED] passage is placeholder text that MUST be replaced with the
- * business's own reviewed statement before publication.
+ * The official security incident notice, structured around the seven content
+ * elements required by N.C. Gen. Stat. § 75-65(d). Factual details come from
+ * ./incident-details so every page stays consistent.
  */
 export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
   slug: 'security-incident-notice',
@@ -18,7 +18,7 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
       heading('h1', text('Notice of Data Security Incident')),
       paragraph(
         text(
-          'This notice is posted by Arielle Cadet-King pursuant to N.C. Gen. Stat. § 75-65. Posted on [DATE]. Last updated [DATE].',
+          `This notice is posted by ${INCIDENT.publishedBy} pursuant to applicable state data breach notification laws, including ${INCIDENT.statuteFull}. Posted on ${INCIDENT.postedDate}. Last updated ${INCIDENT.lastUpdated}.`,
         ),
       ),
     ),
@@ -30,30 +30,38 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
         {
           size: 'full',
           richText: root(
-            paragraph(
-              bold(
-                '[DRAFT PLACEHOLDER — This entire notice is placeholder text. Replace every bracketed section with your own statement, reviewed with the investigating agency, before publishing.]',
-              ),
-            ),
-
             heading('h2', text('What Happened')),
             paragraph(
               text(
-                '[Describe the incident in general terms: an unauthorized party gained access to systems/accounts beginning in or around [YEAR]. The incident was discovered on [DATE]. Law enforcement was notified and the matter is under active investigation by the North Carolina Department of Justice. Do not include details that could impede the investigation.]',
+                'Beginning in or around 2019, an unauthorized party gained access to systems and accounts associated with this business and used that access, and the identity of the business owner, without authorization. The unauthorized activity continued until it was discovered in February 2026. Upon discovery, the matter was reported to law enforcement and is now under active investigation by ',
+              ),
+              text(INCIDENT.investigatingAgency + '.'),
+            ),
+
+            heading('h2', text('Unauthorized Cryptocurrency Activity')),
+            paragraph(
+              text(
+                'The investigation has determined that, during this period, an unauthorized party used the business owner’s identity to conduct cryptocurrency mining and related transactions without her knowledge or consent. Approximately ',
+              ),
+              bold('$788 million'),
+              text(' in total activity is under investigation, of which approximately '),
+              bold('$700,000'),
+              text(
+                ' has been confirmed to date. These figures are preliminary and may change as the investigation continues.',
               ),
             ),
 
             heading('h2', text('What Information Was Involved')),
             paragraph(
               text(
-                '[Describe the types of personal information that were or may have been subject to unauthorized access or acquisition — for example: names, addresses, email addresses, telephone numbers, financial account information. Be specific about categories, not individuals.]',
+                'Based on the nature of the incident, the personal information that was or may have been subject to unauthorized access or acquisition may have included prior clients’ names and contact information (such as mailing address, telephone number, and email address) and financial account information, or other information that would permit access to a financial account or resources. The full scope of the categories of information involved is still being determined through the ongoing investigation, and this notice will be updated as more is confirmed.',
               ),
             ),
 
             heading('h2', text('What We Are Doing')),
             paragraph(
               text(
-                '[Describe the general steps taken to protect personal information from further unauthorized access — for example: securing affected accounts and systems, engaging law enforcement, notifying affected individuals and state authorities, establishing this website and a dedicated contact line.]',
+                `The business has taken steps to protect personal information from further unauthorized access, including securing affected accounts and systems, reporting the matter to law enforcement, cooperating fully with the investigating agency, notifying affected individuals, notifying the appropriate consumer protection authorities in ${INCIDENT.statesFiledCount} states, and establishing this website and a dedicated contact channel where affected individuals can obtain information and assistance.`,
               ),
             ),
 
@@ -67,12 +75,7 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
             ),
 
             heading('h2', text('For Further Information and Assistance')),
-            paragraph(
-              text('Telephone: '),
-              bold('[DEDICATED INCIDENT PHONE NUMBER — TBD]'),
-              text(' — Email: '),
-              bold('[DEDICATED INCIDENT EMAIL — TBD]'),
-            ),
+            paragraph(...contactChannelNodes()),
             paragraph(
               text('You can also reach us through the '),
               link('/contact', 'contact page'),
@@ -95,14 +98,13 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
               text(' — P.O. Box 2000, Chester, PA 19016 — 1-800-916-8800 — transunion.com'),
             ),
 
-            heading(
-              'h2',
-              text('Federal Trade Commission and North Carolina Attorney General'),
-            ),
+            heading('h2', text('Federal Trade Commission and State Attorneys General')),
             paragraph(
               text(
-                'You can obtain information from the Federal Trade Commission and the North Carolina Attorney General’s Office about steps you can take to prevent identity theft.',
+                'You can obtain information from the Federal Trade Commission and from your state Attorney General’s office about steps you can take to prevent identity theft. Notice of this incident has been provided to the appropriate consumer protection authorities in ',
               ),
+              text(String(INCIDENT.statesFiledCount)),
+              text(' states.'),
             ),
             paragraph(
               bold('Federal Trade Commission'),
@@ -111,16 +113,24 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
               ),
             ),
             paragraph(
-              bold('North Carolina Attorney General’s Office'),
+              bold('North Carolina Department of Justice (lead investigating agency)'),
               text(
                 ' — Consumer Protection Division, 9001 Mail Service Center, Raleigh, NC 27699-9001 — 1-877-566-7226 (1-877-5-NO-SCAM) — ncdoj.gov',
               ),
+            ),
+            paragraph(
+              bold('Your State Attorney General'),
+              text(
+                ' — Residents of any state may contact their own state Attorney General’s office. A directory of every state Attorney General is available from the National Association of Attorneys General at ',
+              ),
+              text(INCIDENT.naagDirectoryUrl),
+              text('.'),
             ),
 
             heading('h2', text('Cryptocurrency Investment Solicitations')),
             paragraph(
               text(
-                '[PLACEHOLDER — pending guidance from the investigating agency: if you were contacted about cryptocurrency or other investment opportunities purporting to be from this business, that contact was not authorized. Describe how affected individuals should report it and which dedicated contact to use.] You may report suspected fraud to the FTC at reportfraud.ftc.gov and to the FBI’s Internet Crime Complaint Center at ic3.gov.',
+                'The investigation has identified that prior clients of the business were contacted and solicited to “invest” in cryptocurrency by a party purporting to represent the business or its owner. These solicitations were not authorized. If you were contacted about a cryptocurrency or other investment opportunity purporting to come from this business, do not respond or send funds. Please report it using the contact information above, and report suspected fraud to the FTC at reportfraud.ftc.gov and to the FBI’s Internet Crime Complaint Center at ic3.gov.',
               ),
             ),
           ),
@@ -131,6 +141,6 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
   meta: {
     title: 'Security Incident Notice',
     description:
-      'Official notice of a data security incident posted pursuant to N.C. Gen. Stat. § 75-65, with information and assistance for potentially affected individuals.',
+      'Official notice of a data security incident posted pursuant to applicable state data breach notification laws, including N.C. Gen. Stat. § 75-65, with information and assistance for potentially affected individuals.',
   },
 }

@@ -1,5 +1,6 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
+import { contactChannelSentence } from './incident-details'
 import { heading, link, paragraph, root, text } from './lexical'
 
 export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
@@ -26,8 +27,10 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
           answer: root(
             paragraph(
               text(
-                '[PLACEHOLDER — describe who is potentially affected, e.g. clients of the business during the period from [YEAR] to [YEAR]. If direct notice was mailed or emailed, say so here.]',
+                'You may be affected if you were a client of the business at any time between 2019 and February 2026, the period during which the unauthorized activity took place. The investigation is still determining the full scope of who and what was affected. If you were a prior client during that period, you should treat yourself as potentially affected and follow the steps on our ',
               ),
+              link('/resources', 'resources page'),
+              text('.'),
             ),
           ),
         },
@@ -48,7 +51,7 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
           answer: root(
             paragraph(
               text(
-                '[PLACEHOLDER — pending guidance from the investigating agency. If you received investment or cryptocurrency solicitations purporting to come from this business, do not respond or send funds. Report it via the contact information on this site, to the FTC at reportfraud.ftc.gov, and to the FBI at ic3.gov.]',
+                'It may be. The investigation has identified that prior clients were solicited to “invest” in cryptocurrency by a party purporting to represent the business or its owner. These solicitations were not authorized. If you received an investment or cryptocurrency solicitation purporting to come from this business, do not respond or send funds. Report it via the contact information on this site, to the FTC at reportfraud.ftc.gov, and to the FBI at ic3.gov.',
               ),
             ),
           ),
@@ -58,7 +61,21 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
           answer: root(
             paragraph(
               text(
-                'The matter is under active investigation by the North Carolina Department of Justice. [PLACEHOLDER — update as other agencies or states open investigations.]',
+                'The matter is under active investigation by the North Carolina Department of Justice, which is the lead agency. Notice of the incident has also been provided to the appropriate consumer protection authorities in 47 states, and additional investigations may be opened as that process continues.',
+              ),
+            ),
+          ),
+        },
+        {
+          question: 'I don’t live in North Carolina — does this apply to me?',
+          answer: root(
+            paragraph(
+              text(
+                'Possibly. Although the North Carolina Department of Justice is the lead investigating agency, notice of this incident has been filed in 47 states, and prior clients in many states may be affected. Regardless of where you live, you can follow the steps on our ',
+              ),
+              link('/resources', 'resources page'),
+              text(
+                ' and contact your own state Attorney General’s office. A directory of every state Attorney General is available from the National Association of Attorneys General at naag.org/find-my-ag.',
               ),
             ),
           ),
@@ -69,23 +86,13 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
             paragraph(
               text('Yes. New information is posted on the '),
               link('/updates', 'Investigation Updates'),
-              text(' page as it becomes available.'),
+              text(' page as it becomes available and as the investigating agency permits.'),
             ),
           ),
         },
         {
           question: 'How can I get more information or assistance?',
-          answer: root(
-            paragraph(
-              text(
-                'Call the dedicated incident line at [PHONE NUMBER — TBD], email [EMAIL — TBD], or use the ',
-              ),
-              link('/contact', 'contact page'),
-              text(
-                '. Please do not include Social Security numbers or account numbers in messages.',
-              ),
-            ),
-          ),
+          answer: root(paragraph(...contactChannelSentence())),
         },
       ],
     },

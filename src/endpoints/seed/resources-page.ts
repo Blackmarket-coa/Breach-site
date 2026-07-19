@@ -84,12 +84,26 @@ export const resourcesPage: RequiredDataFromCollectionSlug<'pages'> = {
         {
           size: 'half',
           richText: root(
-            heading('h3', text('North Carolina Attorney General’s Office')),
+            heading('h3', text('North Carolina Department of Justice')),
+            paragraph(text('Lead investigating agency')),
             paragraph(text('Consumer Protection Division')),
             paragraph(text('9001 Mail Service Center')),
             paragraph(text('Raleigh, NC 27699-9001')),
             paragraph(bold('1-877-566-7226'), text(' (1-877-5-NO-SCAM)')),
             paragraph(text('www.ncdoj.gov')),
+          ),
+        },
+        {
+          size: 'full',
+          richText: root(
+            heading('h3', text('Your State Attorney General')),
+            paragraph(
+              text(
+                'Notice of this incident has been provided to the appropriate consumer protection authorities in 47 states. Residents of any state may contact their own state Attorney General’s office for information about steps to prevent identity theft. A directory of every state Attorney General is available from the National Association of Attorneys General at ',
+              ),
+              bold('naag.org/find-my-ag'),
+              text('.'),
+            ),
           ),
         },
         {
@@ -115,6 +129,6 @@ export const resourcesPage: RequiredDataFromCollectionSlug<'pages'> = {
   meta: {
     title: 'Identity Theft & Consumer Resources',
     description:
-      'Contact information for the nationwide consumer reporting agencies, the FTC, and the North Carolina Attorney General’s Office, with steps to prevent identity theft.',
+      'Contact information for the nationwide consumer reporting agencies, the FTC, the North Carolina Department of Justice, and state Attorneys General, with steps to prevent identity theft.',
   },
 }

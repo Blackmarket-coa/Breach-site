@@ -1,5 +1,6 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
+import { INCIDENT, defaultFromAddress } from './incident-details'
 import { heading, paragraph, root, text } from './lexical'
 
 export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
@@ -15,8 +16,10 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
   ),
   emails: [
     {
-      emailFrom: `"Incident Response Portal" <${process.env.EMAIL_FROM_ADDRESS || 'notifications@example.com'}>`,
-      emailTo: process.env.ADMIN_NOTIFICATION_EMAIL || 'admin@example.com',
+      // From must be a verified sending domain (Resend); default to the site
+      // domain, never the Proton inbox. The Proton inbox is the recipient.
+      emailFrom: `"Incident Response Portal" <${process.env.EMAIL_FROM_ADDRESS || defaultFromAddress()}>`,
+      emailTo: process.env.ADMIN_NOTIFICATION_EMAIL || INCIDENT.email,
       subject: 'New contact form submission',
       message: root(
         paragraph(text('A new message was submitted through the incident response portal:')),
@@ -32,16 +35,16 @@ export const contactForm: RequiredDataFromCollectionSlug<'forms'> = {
       name: 'full-name',
       blockName: 'full-name',
       blockType: 'text',
-      label: 'Full Name',
-      required: true,
+      label: 'Full Name (optional)',
+      required: false,
       width: 100,
     },
     {
       name: 'email',
       blockName: 'email',
       blockType: 'email',
-      label: 'Email',
-      required: true,
+      label: 'Email (optional — needed only if you want a response)',
+      required: false,
       width: 100,
     },
     {

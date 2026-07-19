@@ -45,7 +45,7 @@ export const home: RequiredDataFromCollectionSlug<'pages'> = {
             heading('h2', text('About This Site')),
             paragraph(
               text(
-                '[PLACEHOLDER — one-paragraph summary in general terms: a data security incident affecting personal information of prior clients was discovered and is under active investigation by the North Carolina Department of Justice. This site is the official source of information about the incident.]',
+                'A data security incident affecting the personal information of prior clients was discovered in February 2026 and is under active investigation by the North Carolina Department of Justice, the lead agency. The unauthorized activity is believed to have taken place between 2019 and February 2026 and included the unauthorized use of the business owner’s identity to conduct cryptocurrency activity. Notice of the incident has been filed in 47 states, and prior clients in many states may be affected. This website is the official source of information about the incident and the resources available to those who may be affected, wherever they live.',
               ),
             ),
           ),
@@ -122,7 +122,7 @@ export const home: RequiredDataFromCollectionSlug<'pages'> = {
         heading('h3', text('Were you contacted about a cryptocurrency investment?')),
         paragraph(
           text(
-            '[PLACEHOLDER — if you were solicited to invest in cryptocurrency by someone claiming to represent this business, do not respond or send funds. Contact us using the dedicated incident line.]',
+            'If you were solicited to “invest” in cryptocurrency by someone claiming to represent this business or its owner, that contact was not authorized. Do not respond or send funds. Please contact us, and report it to the FTC at reportfraud.ftc.gov and the FBI at ic3.gov.',
           ),
         ),
       ),
