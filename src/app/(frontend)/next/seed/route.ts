@@ -5,6 +5,24 @@ import { headers } from 'next/headers'
 
 export const maxDuration = 60 // This function can run for a maximum of 60 seconds
 
+// Build a human-readable cause chain (name/code/message) so seeding failures —
+// e.g. an S3 misconfiguration (`NoSuchBucket`, `AccessDenied`,
+// `SignatureDoesNotMatch`) or a filesystem error (`ENOENT`, `EROFS`) — are
+// visible to the admin who triggered the seed instead of an opaque 500.
+function describeError(error: unknown): string {
+  const parts: string[] = []
+  let current: unknown = error
+  for (let depth = 0; current && typeof current === 'object' && depth < 5; depth++) {
+    const err = current as { name?: unknown; code?: unknown; message?: unknown; cause?: unknown }
+    const label = [err.name, err.code].filter((v) => typeof v === 'string').join(' ')
+    const message = typeof err.message === 'string' ? err.message : ''
+    const piece = [label, message].filter(Boolean).join(': ')
+    if (piece) parts.push(piece)
+    current = err.cause
+  }
+  return parts.join(' ← ') || String(error)
+}
+
 export async function POST(): Promise<Response> {
   const payload = await getPayloadClient()
   const requestHeaders = await headers()
@@ -26,6 +44,9 @@ export async function POST(): Promise<Response> {
     return Response.json({ success: true })
   } catch (e) {
     payload.logger.error({ err: e, message: 'Error seeding data' })
-    return new Response('Error seeding data.', { status: 500 })
+    // Endpoint is authenticated (admin-only), so returning the cause is safe and
+    // makes setup problems (e.g. media storage) diagnosable without digging
+    // through server logs.
+    return new Response(`Error seeding data: ${describeError(e)}`, { status: 500 })
   }
 }
