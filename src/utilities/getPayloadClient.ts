@@ -37,6 +37,8 @@ const RETRYABLE_CODES = new Set([
   'ENETUNREACH',
   'EPIPE',
   'EAI_AGAIN',
+  '53300', // too_many_connections (Postgres)
+  '53400', // configuration_limit_exceeded (Postgres)
 ])
 
 const RETRYABLE_MESSAGES = [
@@ -48,6 +50,15 @@ const RETRYABLE_MESSAGES = [
   'etimedout',
   'econnreset',
   'econnrefused',
+  // Pooler/server ran out of client slots. These are transient — slots free up
+  // as other requests finish — so retrying (and, at build time, skipping
+  // prerender rather than aborting) is the right response. Supabase's pooler
+  // reports EMAXCONNSESSION; stock Postgres says "too many clients".
+  'max clients reached',
+  'emaxconnsession',
+  'too many clients',
+  'too many connections',
+  'remaining connection slots',
 ]
 
 export const isConnectionError = (error: unknown, depth = 0): boolean => {
