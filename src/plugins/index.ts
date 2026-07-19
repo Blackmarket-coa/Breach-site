@@ -119,6 +119,13 @@ export const plugins: Plugin[] = [
           collections: {
             media: true,
           },
+          // Upload straight from the browser to S3 via a presigned URL. Vercel
+          // caps function request bodies at 4.5 MB, so routing uploads through
+          // Payload would reject larger files — and this collection allows PDFs
+          // (official notices) that can exceed that. Presigned uploads are
+          // gated to authenticated users by default (matches Media's create
+          // access). Requires the bucket to allow CORS from the site origin.
+          clientUploads: true,
           bucket: process.env.S3_BUCKET,
           config: {
             endpoint: process.env.S3_ENDPOINT,
