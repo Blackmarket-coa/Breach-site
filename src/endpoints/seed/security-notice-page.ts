@@ -18,7 +18,7 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
       heading('h1', text('Notice of Data Security Incident')),
       paragraph(
         text(
-          `This notice is posted by ${INCIDENT.publishedBy} pursuant to ${INCIDENT.statuteFull}. Posted on ${INCIDENT.postedDate}. Last updated ${INCIDENT.lastUpdated}.`,
+          `This notice is posted by ${INCIDENT.publishedBy} pursuant to applicable state data breach notification laws, including ${INCIDENT.statuteFull}. Posted on ${INCIDENT.postedDate}. Last updated ${INCIDENT.lastUpdated}.`,
         ),
       ),
     ),
@@ -61,7 +61,7 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
             heading('h2', text('What We Are Doing')),
             paragraph(
               text(
-                'The business has taken steps to protect personal information from further unauthorized access, including securing affected accounts and systems, reporting the matter to law enforcement, cooperating fully with the investigating agency, notifying affected individuals and state authorities, and establishing this website and a dedicated contact channel where affected individuals can obtain information and assistance.',
+                `The business has taken steps to protect personal information from further unauthorized access, including securing affected accounts and systems, reporting the matter to law enforcement, cooperating fully with the investigating agency, notifying affected individuals, notifying the appropriate consumer protection authorities in ${INCIDENT.statesFiledCount} states, and establishing this website and a dedicated contact channel where affected individuals can obtain information and assistance.`,
               ),
             ),
 
@@ -98,11 +98,13 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
               text(' — P.O. Box 2000, Chester, PA 19016 — 1-800-916-8800 — transunion.com'),
             ),
 
-            heading('h2', text('Federal Trade Commission and North Carolina Attorney General')),
+            heading('h2', text('Federal Trade Commission and State Attorneys General')),
             paragraph(
               text(
-                'You can obtain information from the Federal Trade Commission and the North Carolina Attorney General’s Office about steps you can take to prevent identity theft.',
+                'You can obtain information from the Federal Trade Commission and from your state Attorney General’s office about steps you can take to prevent identity theft. Notice of this incident has been provided to the appropriate consumer protection authorities in ',
               ),
+              text(String(INCIDENT.statesFiledCount)),
+              text(' states.'),
             ),
             paragraph(
               bold('Federal Trade Commission'),
@@ -111,10 +113,18 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
               ),
             ),
             paragraph(
-              bold('North Carolina Attorney General’s Office'),
+              bold('North Carolina Department of Justice (lead investigating agency)'),
               text(
                 ' — Consumer Protection Division, 9001 Mail Service Center, Raleigh, NC 27699-9001 — 1-877-566-7226 (1-877-5-NO-SCAM) — ncdoj.gov',
               ),
+            ),
+            paragraph(
+              bold('Your State Attorney General'),
+              text(
+                ' — Residents of any state may contact their own state Attorney General’s office. A directory of every state Attorney General is available from the National Association of Attorneys General at ',
+              ),
+              text(INCIDENT.naagDirectoryUrl),
+              text('.'),
             ),
 
             heading('h2', text('Cryptocurrency Investment Solicitations')),
@@ -131,6 +141,6 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
   meta: {
     title: 'Security Incident Notice',
     description:
-      'Official notice of a data security incident posted pursuant to N.C. Gen. Stat. § 75-65, with information and assistance for potentially affected individuals.',
+      'Official notice of a data security incident posted pursuant to applicable state data breach notification laws, including N.C. Gen. Stat. § 75-65, with information and assistance for potentially affected individuals.',
   },
 }

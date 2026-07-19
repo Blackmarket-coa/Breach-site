@@ -45,7 +45,7 @@ export const home: RequiredDataFromCollectionSlug<'pages'> = {
             heading('h2', text('About This Site')),
             paragraph(
               text(
-                'A data security incident affecting the personal information of prior clients was discovered in February 2026 and is under active investigation by the North Carolina Department of Justice. The unauthorized activity is believed to have taken place between 2019 and February 2026 and included the unauthorized use of the business owner’s identity to conduct cryptocurrency activity. This website is the official source of information about the incident and the resources available to those who may be affected.',
+                'A data security incident affecting the personal information of prior clients was discovered in February 2026 and is under active investigation by the North Carolina Department of Justice, the lead agency. The unauthorized activity is believed to have taken place between 2019 and February 2026 and included the unauthorized use of the business owner’s identity to conduct cryptocurrency activity. Notice of the incident has been filed in 47 states, and prior clients in many states may be affected. This website is the official source of information about the incident and the resources available to those who may be affected, wherever they live.',
               ),
             ),
           ),

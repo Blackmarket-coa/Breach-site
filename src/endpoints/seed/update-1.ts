@@ -26,7 +26,7 @@ export const update1: (args: Update1Args) => RequiredDataFromCollectionSlug<'pos
     ),
     paragraph(
       text(
-        'A dedicated line and email have been established for potentially affected prior clients to obtain information and assistance. Notice is also being provided to consumer protection authorities in other states.',
+        'A dedicated line and email have been established for potentially affected prior clients to obtain information and assistance. Notice of the incident has been filed with the appropriate consumer protection authorities in 47 states.',
       ),
     ),
     paragraph(

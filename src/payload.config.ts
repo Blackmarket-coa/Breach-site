@@ -103,8 +103,17 @@ export default buildConfig({
   email: process.env.RESEND_API_KEY
     ? resendAdapter({
         apiKey: process.env.RESEND_API_KEY,
+        // Resend requires a verified sending domain; default to the site
+        // domain rather than a free-mail inbox that cannot send.
         defaultFromAddress:
-          process.env.EMAIL_FROM_ADDRESS || 'thelizzardoverlordscaneatmy@proton.me',
+          process.env.EMAIL_FROM_ADDRESS ||
+          `notifications@${(() => {
+            try {
+              return new URL(getServerSideURL()).hostname
+            } catch {
+              return 'localhost'
+            }
+          })()}`,
         defaultFromName: process.env.EMAIL_FROM_NAME || 'Incident Response Portal',
       })
     : undefined,

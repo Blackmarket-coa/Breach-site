@@ -25,8 +25,23 @@ export const INCIDENT = {
   postedDate: 'July 19, 2026',
   lastUpdated: 'July 19, 2026',
 
-  /** Investigating agency. */
+  /** Investigating agency (lead). */
   investigatingAgency: 'the North Carolina Department of Justice',
+
+  /**
+   * Number of U.S. states where breach notice has been filed. The notice is
+   * posted under applicable state data breach notification laws generally,
+   * with North Carolina as the lead jurisdiction (NCDOJ is investigating).
+   */
+  statesFiledCount: 47,
+
+  /**
+   * National Association of Attorneys General consumer directory — the
+   * universal, always-current pointer to every state's Attorney General, so
+   * residents of any state can find their own office without this site
+   * maintaining 50+ addresses.
+   */
+  naagDirectoryUrl: 'naag.org/find-my-ag',
 
   /**
    * Dedicated incident contact channel — the new customer-support line and
@@ -38,6 +53,32 @@ export const INCIDENT = {
 
 export const hasPhone = (): boolean => INCIDENT.phone.trim().length > 0
 export const hasEmail = (): boolean => INCIDENT.email.trim().length > 0
+
+/**
+ * Default "From" address for outgoing notification email.
+ *
+ * Resend requires the sender to be on a domain you have verified; a free-mail
+ * address (like the incident Proton inbox) can receive mail but will never
+ * send. So the From address is derived from the site's own domain — which you
+ * can verify in Resend — rather than the Proton inbox. Override any time with
+ * EMAIL_FROM_ADDRESS. The Proton inbox stays the *recipient* of submissions.
+ */
+export const defaultFromAddress = (): string => {
+  const serverUrl =
+    process.env.NEXT_PUBLIC_SERVER_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : 'http://localhost:3000')
+
+  let host = 'localhost'
+  try {
+    host = new URL(serverUrl).hostname
+  } catch {
+    // keep fallback host
+  }
+
+  return `notifications@${host}`
+}
 
 /**
  * Lexical children describing how to reach the dedicated incident channel.

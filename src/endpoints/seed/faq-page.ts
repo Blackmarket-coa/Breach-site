@@ -61,7 +61,21 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
           answer: root(
             paragraph(
               text(
-                'The matter is under active investigation by the North Carolina Department of Justice. Notice is also being provided to consumer protection authorities in other states, and additional investigations may be opened as that process continues.',
+                'The matter is under active investigation by the North Carolina Department of Justice, which is the lead agency. Notice of the incident has also been provided to the appropriate consumer protection authorities in 47 states, and additional investigations may be opened as that process continues.',
+              ),
+            ),
+          ),
+        },
+        {
+          question: 'I don’t live in North Carolina — does this apply to me?',
+          answer: root(
+            paragraph(
+              text(
+                'Possibly. Although the North Carolina Department of Justice is the lead investigating agency, notice of this incident has been filed in 47 states, and prior clients in many states may be affected. Regardless of where you live, you can follow the steps on our ',
+              ),
+              link('/resources', 'resources page'),
+              text(
+                ' and contact your own state Attorney General’s office. A directory of every state Attorney General is available from the National Association of Attorneys General at naag.org/find-my-ag.',
               ),
             ),
           ),
