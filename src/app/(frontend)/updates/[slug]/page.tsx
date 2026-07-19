@@ -19,6 +19,11 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 // when the database was unreachable during the build — see generateStaticParams).
 export const dynamicParams = true
 
+// Regenerate statically-rendered posts from the database at most once a minute,
+// as a backstop to the on-demand revalidation hooks, so content changes appear
+// without a full redeploy.
+export const revalidate = 60
+
 export function generateStaticParams() {
   return generateStaticParamsSafe('/updates/[slug]', async () => {
     const payload = await getPayloadClient()
