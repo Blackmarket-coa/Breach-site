@@ -113,9 +113,10 @@ Any Docker host works; [Fly.io](https://fly.io) is the concrete example. (Altern
      --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY='...'
    ```
 
-5. **Media persistence:** container filesystems are ephemeral, and uploads default to `public/media` on disk. Pick one before accepting uploads:
-   - Recommended: add `@payloadcms/storage-s3` pointed at Supabase Storage's S3-compatible endpoint (Project Settings → Storage → S3 access keys), or Cloudflare R2.
-   - Low-tech: mount a Fly volume at the media path (`fly volumes create`).
+5. **Media persistence:** serverless/container filesystems are ephemeral, and uploads default to `public/media` on disk. `@payloadcms/storage-s3` is already wired in (`src/plugins`) and activates automatically when the five `S3_*` variables below are set — otherwise media falls back to local disk (fine for local dev, not for Vercel/Fly). Configure Supabase Storage:
+   - In Supabase: **Storage → Create bucket** (e.g. `media`; it can stay **private** — files are served through Payload, not the bucket's public URL), then **Storage → S3 Connection / Settings → S3 access keys → New access key**.
+   - Set `S3_BUCKET`, `S3_REGION` (the project's region, e.g. `us-east-1`), `S3_ENDPOINT` (`https://<project-ref>.supabase.co/storage/v1/s3`), `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`. On Vercel add them to the project env and redeploy.
+   - Alternatives: the same `S3_*` variables point at any S3-compatible store (Cloudflare R2, AWS S3); on Fly you can instead mount a volume at the media path (`fly volumes create`).
 
 ## 3. Cloudflare (domain, HTTPS, WAF, Turnstile)
 
@@ -164,6 +165,7 @@ Any Docker host works; [Fly.io](https://fly.io) is the concrete example. (Altern
 | `RESEND_API_KEY` | Email sending (unset = log to console) | no |
 | `EMAIL_FROM_ADDRESS` / `EMAIL_FROM_NAME` | From identity on notifications | no |
 | `ADMIN_NOTIFICATION_EMAIL` | Recipient of contact-form notifications (used at seed time) | no |
+| `S3_BUCKET` / `S3_REGION` / `S3_ENDPOINT` / `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Media storage (Supabase Storage S3). All five together enable off-disk uploads; unset = local disk | no |
 
 ## 6. Operational notes
 
