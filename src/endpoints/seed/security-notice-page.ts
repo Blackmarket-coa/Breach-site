@@ -54,7 +54,7 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
             heading('h2', text('What Information Was Involved')),
             paragraph(
               text(
-                'The specific categories of personal information that were or may have been subject to unauthorized access or acquisition are still being determined through the ongoing investigation. The information at issue is of the type maintained in the ordinary course of the business’s prior client relationships. This notice will be updated as the investigation identifies the specific categories of information involved.',
+                'Based on the nature of the incident, the personal information that was or may have been subject to unauthorized access or acquisition may have included prior clients’ names and contact information (such as mailing address, telephone number, and email address) and financial account information, or other information that would permit access to a financial account or resources. The full scope of the categories of information involved is still being determined through the ongoing investigation, and this notice will be updated as more is confirmed.',
               ),
             ),
 
