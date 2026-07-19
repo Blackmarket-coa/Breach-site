@@ -60,6 +60,7 @@ End-to-end guide for taking this portal from repository to production behind Clo
 
 - Production schema changes happen **only** via committed migrations: `pnpm migrate:create <name>` locally, commit `src/migrations/`, then `pnpm migrate` runs in CI/the release step.
 - Local dev uses push mode against a throwaway local Postgres. **Never point `pnpm dev` at the Supabase database** — push mode and migrations must not mix.
+- **On Vercel**, committed migrations are applied automatically as the first step of the build, but **only on Production deployments** (`scripts/predeploy-migrate.mjs`, gated on `VERCEL_ENV === 'production'`). Preview deploys, local `pnpm build`, and CI skip it — so a preview branch never mutates the production schema, and CI still migrates its own throwaway database in a separate step. A failed migration aborts the deploy. On a Docker/Fly host, run migrations via the release step instead (see §2).
 
 ## 2. Hosting (Docker behind Cloudflare)
 
