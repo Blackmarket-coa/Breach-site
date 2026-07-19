@@ -3,6 +3,7 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
@@ -25,6 +26,20 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
+
+// Serverless hosts (e.g. Vercel) have an ephemeral, read-only filesystem, so
+// uploads written to `public/media` on disk do not persist. When S3 credentials
+// are provided we store media in an S3-compatible bucket (Supabase Storage)
+// instead. Files are still served through Payload's own route (same origin, so
+// no CSP img-src changes needed); the bucket can stay private. Without these
+// env vars — local dev and CI — media falls back to local disk unchanged.
+const s3StorageConfigured = Boolean(
+  process.env.S3_BUCKET &&
+    process.env.S3_REGION &&
+    process.env.S3_ENDPOINT &&
+    process.env.S3_ACCESS_KEY_ID &&
+    process.env.S3_SECRET_ACCESS_KEY,
+)
 
 export const plugins: Plugin[] = [
   redirectsPlugin({
@@ -98,4 +113,31 @@ export const plugins: Plugin[] = [
       },
     },
   }),
+  ...(s3StorageConfigured
+    ? [
+        s3Storage({
+          collections: {
+            media: true,
+          },
+          // Upload straight from the browser to S3 via a presigned URL. Vercel
+          // caps function request bodies at 4.5 MB, so routing uploads through
+          // Payload would reject larger files — and this collection allows PDFs
+          // (official notices) that can exceed that. Presigned uploads are
+          // gated to authenticated users by default (matches Media's create
+          // access). Requires the bucket to allow CORS from the site origin.
+          clientUploads: true,
+          bucket: process.env.S3_BUCKET,
+          config: {
+            endpoint: process.env.S3_ENDPOINT,
+            region: process.env.S3_REGION,
+            // Supabase Storage's S3 endpoint requires path-style addressing.
+            forcePathStyle: true,
+            credentials: {
+              accessKeyId: process.env.S3_ACCESS_KEY_ID,
+              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+            },
+          },
+        }),
+      ]
+    : []),
 ]

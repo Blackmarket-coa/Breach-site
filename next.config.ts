@@ -68,6 +68,12 @@ const nextConfig: NextConfig = {
   // Set NEXT_OUTPUT=standalone for Docker builds (see Dockerfile); `next start`
   // and Vercel deployments require the default output mode.
   output: process.env.NEXT_OUTPUT === 'standalone' ? 'standalone' : undefined,
+  // The /next/seed endpoint reads the hero image from disk (fs.readFile). Ensure
+  // the asset is traced into the serverless function bundle so seeding works on
+  // Vercel — otherwise the read ENOENTs and seeding fails with a 500.
+  outputFileTracingIncludes: {
+    '/next/seed': ['./src/endpoints/seed/*.webp'],
+  },
   headers: async () => [
     {
       source: '/(.*)',
