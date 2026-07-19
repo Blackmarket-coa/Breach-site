@@ -85,9 +85,15 @@ export default buildConfig({
       connectionTimeoutMillis: Number(process.env.PAYLOAD_DB_CONNECT_TIMEOUT_MS) || 10000,
       // Keep sockets alive through NAT/pooler idle windows.
       keepAlive: true,
-      // Supabase's connection pooler caps concurrent connections; a small pool
-      // is plenty for build-time static generation and serverless runtime.
-      max: Number(process.env.PAYLOAD_DB_POOL_MAX) || 10,
+      // Supabase's pooler caps *total* concurrent clients (session mode defaults
+      // to a pool_size of ~15). On Vercel every warm serverless instance keeps
+      // its own pool, so a large per-instance `max` lets a handful of instances —
+      // or a single parallel operation like seeding — exhaust the pooler with
+      // "max clients reached in session mode" (EMAXCONNSESSION). Keep it small so
+      // many instances still fit under the pooler's ceiling; a couple of
+      // connections is plenty since a Vercel function serves one request at a
+      // time. Raise via env only if you also raise Supabase's Pool Size.
+      max: Number(process.env.PAYLOAD_DB_POOL_MAX) || 3,
     },
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
