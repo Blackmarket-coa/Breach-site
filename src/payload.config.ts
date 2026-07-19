@@ -103,7 +103,8 @@ export default buildConfig({
   email: process.env.RESEND_API_KEY
     ? resendAdapter({
         apiKey: process.env.RESEND_API_KEY,
-        defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'notifications@example.com',
+        defaultFromAddress:
+          process.env.EMAIL_FROM_ADDRESS || 'thelizzardoverlordscaneatmy@proton.me',
         defaultFromName: process.env.EMAIL_FROM_NAME || 'Incident Response Portal',
       })
     : undefined,

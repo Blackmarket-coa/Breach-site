@@ -18,15 +18,15 @@ export const update1: (args: Update1Args) => RequiredDataFromCollectionSlug<'pos
   categories: category ? [category.id] : [],
   heroImage: heroImage?.id,
   content: root(
-    paragraph(
-      text(
-        '[PLACEHOLDER — sample investigation update. Replace with your first real update before launch.]',
-      ),
-    ),
     heading('h2', text('Notice Posted')),
     paragraph(
       text(
-        'The official security incident notice has been posted on this website pursuant to N.C. Gen. Stat. § 75-65. The incident remains under active investigation by the North Carolina Department of Justice.',
+        'The official security incident notice has been posted on this website pursuant to N.C. Gen. Stat. § 75-65. The incident, which involves unauthorized access beginning in or around 2019 and the unauthorized use of the business owner’s identity to conduct cryptocurrency activity through February 2026, remains under active investigation by the North Carolina Department of Justice.',
+      ),
+    ),
+    paragraph(
+      text(
+        'A dedicated line and email have been established for potentially affected prior clients to obtain information and assistance. Notice is also being provided to consumer protection authorities in other states.',
       ),
     ),
     paragraph(

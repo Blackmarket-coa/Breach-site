@@ -1,6 +1,7 @@
 import type { Form } from '@/payload-types'
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
+import { INCIDENT, hasEmail, hasPhone } from './incident-details'
 import { bold, heading, paragraph, root, text } from './lexical'
 
 type ContactArgs = {
@@ -10,6 +11,24 @@ type ContactArgs = {
 export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pages'> = ({
   contactForm,
 }) => {
+  const channelNodes = []
+
+  if (hasPhone()) {
+    channelNodes.push(paragraph(text('Telephone: '), bold(INCIDENT.phone)))
+  }
+  if (hasEmail()) {
+    channelNodes.push(paragraph(text('Email: '), bold(INCIDENT.email)))
+  }
+  if (channelNodes.length === 0) {
+    channelNodes.push(
+      paragraph(
+        text(
+          'A dedicated telephone line and email address for this incident are being established and will be posted here as soon as they are active. In the meantime, please use the secure message form below.',
+        ),
+      ),
+    )
+  }
+
   return {
     slug: 'contact',
     _status: 'published',
@@ -20,7 +39,7 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
         heading('h1', text('Contact')),
         paragraph(
           text(
-            'A dedicated phone line and email address have been established for questions about this incident.',
+            'Use the information below if you have questions about this incident or believe you may be affected. You are not required to submit any personal information to obtain assistance.',
           ),
         ),
       ),
@@ -31,12 +50,7 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
         columns: [
           {
             size: 'half',
-            richText: root(
-              heading('h2', text('Dedicated Incident Line')),
-              paragraph(text('Telephone: '), bold('[PHONE NUMBER — TBD]')),
-              paragraph(text('Email: '), bold('[EMAIL ADDRESS — TBD]')),
-              paragraph(text('[Hours of availability — TBD]')),
-            ),
+            richText: root(heading('h2', text('Dedicated Incident Line')), ...channelNodes),
           },
           {
             size: 'half',
@@ -64,7 +78,7 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
           heading('h3', text('Send a Message')),
           paragraph(
             text(
-              'You may also send a message using this form. It is protected against automated abuse, and messages are delivered only to the incident response administrator.',
+              'You may also send a message using this form. It is protected against automated abuse, and messages are delivered only to the incident response administrator. Providing your contact information is optional and only needed if you would like a response.',
             ),
           ),
         ),
