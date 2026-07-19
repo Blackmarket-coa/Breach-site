@@ -48,7 +48,7 @@ export const INCIDENT = {
    * mailbox set up specifically for this incident (not personal contacts).
    */
   phone: '930-410-6815',
-  email: 'thelizzardoverlordscaneatmy@proton.me',
+  email: 'arielleshrugged@proton.me',
 } as const
 
 export const hasPhone = (): boolean => INCIDENT.phone.trim().length > 0
