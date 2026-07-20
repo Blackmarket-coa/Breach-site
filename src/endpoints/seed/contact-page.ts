@@ -2,7 +2,7 @@ import type { Form } from '@/payload-types'
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
 import { EMAIL_LINK_LABEL, INCIDENT, emailHref, hasEmail, hasPhone } from './incident-details'
-import { bold, heading, paragraph, root, text } from './lexical'
+import { bold, heading, link, paragraph, root, text } from './lexical'
 
 type ContactArgs = {
   contactForm: Form
@@ -59,8 +59,10 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
         heading('h1', text('Contact')),
         paragraph(
           text(
-            'Use the information below if you have questions about this incident or believe you may be affected. You are not required to submit any personal information to obtain assistance.',
+            'Use the information below if you have questions about this incident or believe you may be affected. To request information and optionally upload a supporting document, please use the ',
           ),
+          link('/request-information', 'Request Information'),
+          text(' page.'),
         ),
       ),
     },
@@ -95,7 +97,7 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
           heading('h3', text('Send a Message')),
           paragraph(
             text(
-              'You may also send a message using this form. It is protected against automated abuse, and messages are delivered only to the incident response administrator. Providing your contact information is optional and only needed if you would like a response.',
+              'You may also send a message using this form. It is protected against automated abuse, and messages are delivered only to the incident response administrator. Name, email, and phone number are required so we can verify and respond to your request.',
             ),
           ),
         ),

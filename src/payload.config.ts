@@ -7,9 +7,11 @@ import { fileURLToPath } from 'url'
 
 import { AuditLogs } from './collections/AuditLogs'
 import { Categories } from './collections/Categories'
+import { InformationRequests } from './collections/InformationRequests'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
+import { RequestDocuments } from './collections/RequestDocuments'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
@@ -97,7 +99,16 @@ export default buildConfig({
     },
     migrationDir: path.resolve(dirname, 'migrations'),
   }),
-  collections: [Pages, Posts, Media, Categories, Users, AuditLogs],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+    AuditLogs,
+    InformationRequests,
+    RequestDocuments,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   // Without RESEND_API_KEY, Payload logs emails to the console (local dev)
   email: process.env.RESEND_API_KEY

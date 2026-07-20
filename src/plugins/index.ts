@@ -46,6 +46,12 @@ const s3StorageConfigured = Boolean(
     process.env.S3_SECRET_ACCESS_KEY,
 )
 
+// Private uploads (request-documents) go to a SEPARATE bucket that must NOT be
+// public — the media bucket is public so it can serve site images. Create a
+// private bucket in Supabase Storage and set S3_PRIVATE_BUCKET to its name.
+const s3PrivateBucket = process.env.S3_PRIVATE_BUCKET
+const privateUploadsConfigured = s3StorageConfigured && Boolean(s3PrivateBucket)
+
 export const plugins: Plugin[] = [
   redirectsPlugin({
     collections: ['pages', 'posts'],
@@ -140,6 +146,31 @@ export const plugins: Plugin[] = [
             credentials: {
               accessKeyId: process.env.S3_ACCESS_KEY_ID,
               secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+            },
+          },
+        }),
+      ]
+    : []),
+  // Private uploads collection in its own PRIVATE bucket: objects use a private
+  // ACL and are only ever served through short-lived signed URLs, generated
+  // after Payload's admin-only access control runs. This keeps client-submitted
+  // documents off the public web even though the media bucket is public.
+  ...(privateUploadsConfigured
+    ? [
+        s3Storage({
+          collections: {
+            'request-documents': true,
+          },
+          acl: 'private',
+          signedDownloads: true,
+          bucket: s3PrivateBucket as string,
+          config: {
+            endpoint: process.env.S3_ENDPOINT,
+            region: process.env.S3_REGION,
+            forcePathStyle: true,
+            credentials: {
+              accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
+              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
             },
           },
         }),
