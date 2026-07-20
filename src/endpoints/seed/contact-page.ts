@@ -1,7 +1,7 @@
 import type { Form } from '@/payload-types'
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
-import { INCIDENT, hasEmail, hasPhone } from './incident-details'
+import { EMAIL_LINK_LABEL, INCIDENT, emailHref, hasEmail, hasPhone } from './incident-details'
 import { bold, heading, paragraph, root, text } from './lexical'
 
 type ContactArgs = {
@@ -17,9 +17,13 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
     channelNodes.push(paragraph(text('Telephone: '), bold(INCIDENT.phone)))
   }
   if (hasEmail()) {
-    channelNodes.push(paragraph(text('Email: '), bold(INCIDENT.email)))
+    // The address itself is never printed — the button below opens the visitor's
+    // mail client. Keeping the raw address off the page avoids scraping.
+    channelNodes.push(
+      paragraph(text('Prefer email? Use the button below to reach the incident team.')),
+    )
   }
-  if (channelNodes.length === 0) {
+  if (!hasPhone() && !hasEmail()) {
     channelNodes.push(
       paragraph(
         text(
@@ -27,6 +31,22 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
         ),
       ),
     )
+  }
+
+  const incidentLineColumn = {
+    size: 'half' as const,
+    richText: root(heading('h2', text('Dedicated Incident Line')), ...channelNodes),
+    ...(hasEmail()
+      ? {
+          enableLink: true,
+          link: {
+            type: 'custom' as const,
+            appearance: 'default' as const,
+            label: EMAIL_LINK_LABEL,
+            url: emailHref(),
+          },
+        }
+      : {}),
   }
 
   return {
@@ -48,10 +68,7 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
       {
         blockType: 'content',
         columns: [
-          {
-            size: 'half',
-            richText: root(heading('h2', text('Dedicated Incident Line')), ...channelNodes),
-          },
+          incidentLineColumn,
           {
             size: 'half',
             richText: root(
