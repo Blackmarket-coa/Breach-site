@@ -62,8 +62,12 @@ export const INCIDENT = {
    * forwarded to the private inbox via Proton custom-domain aliases or a free
    * service like Cloudflare Email Routing) so the real inbox is never exposed.
    * If left blank, the link falls back to the private address.
+   *
+   * Set to an alias on breachnoticevaloanlady.com. You must create the
+   * forwarding rule (Cloudflare Email Routing or Proton custom-domain alias)
+   * so mail to this address is delivered to the private Proton inbox above.
    */
-  publicEmail: '',
+  publicEmail: 'incident@breachnoticevaloanlady.com',
 } as const
 
 export const hasPhone = (): boolean => INCIDENT.phone.trim().length > 0
