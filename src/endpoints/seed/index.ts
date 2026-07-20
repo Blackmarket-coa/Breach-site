@@ -174,6 +174,13 @@ export const seed = async ({
           },
           pageRef(faqDoc, 'FAQ'),
           pageRef(resourcesDoc, 'Resources'),
+          {
+            link: {
+              type: 'custom',
+              label: 'Request Information',
+              url: '/request-information',
+            },
+          },
           pageRef(contactPage, 'Contact'),
         ],
       },

@@ -73,6 +73,8 @@ export interface Config {
     categories: Category;
     users: User;
     'audit-logs': AuditLog;
+    'information-requests': InformationRequest;
+    'request-documents': RequestDocument;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -96,6 +98,8 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
+    'information-requests': InformationRequestsSelect<false> | InformationRequestsSelect<true>;
+    'request-documents': RequestDocumentsSelect<false> | RequestDocumentsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -831,6 +835,51 @@ export interface AuditLog {
   createdAt: string;
 }
 /**
+ * Requests for information from potentially-affected individuals.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "information-requests".
+ */
+export interface InformationRequest {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  topic?: ('general' | 'affected-client' | 'crypto-solicitation') | null;
+  message: string;
+  /**
+   * Optional supporting document uploaded by the requester (private).
+   */
+  document?: (number | null) | RequestDocument;
+  status?: ('new' | 'in-review' | 'responded' | 'closed') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Private documents uploaded with information requests. Admin-only; not publicly accessible.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "request-documents".
+ */
+export interface RequestDocument {
+  id: number;
+  /**
+   * Optional label captured at upload time.
+   */
+  submitterNote?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1043,6 +1092,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'audit-logs';
         value: number | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'information-requests';
+        value: number | InformationRequest;
+      } | null)
+    | ({
+        relationTo: 'request-documents';
+        value: number | RequestDocument;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1438,6 +1495,39 @@ export interface AuditLogsSelect<T extends boolean = true> {
   detail?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "information-requests_select".
+ */
+export interface InformationRequestsSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  topic?: T;
+  message?: T;
+  document?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "request-documents_select".
+ */
+export interface RequestDocumentsSelect<T extends boolean = true> {
+  submitterNote?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

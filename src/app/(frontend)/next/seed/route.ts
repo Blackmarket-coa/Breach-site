@@ -24,17 +24,22 @@ function describeError(error: unknown): string {
 }
 
 export async function POST(): Promise<Response> {
-  const payload = await getPayloadClient()
-  const requestHeaders = await headers()
-
-  // Authenticate by passing request headers
-  const { user } = await payload.auth({ headers: requestHeaders })
-
-  if (!user) {
-    return new Response('Action forbidden.', { status: 403 })
-  }
-
+  // Everything is inside the try/catch — including getPayloadClient() and
+  // auth() — so a database connection failure (e.g. a transient Supabase
+  // pooler timeout) surfaces as a readable message instead of an opaque 500
+  // with an empty body.
+  let payload: Awaited<ReturnType<typeof getPayloadClient>> | undefined
   try {
+    payload = await getPayloadClient()
+    const requestHeaders = await headers()
+
+    // Authenticate by passing request headers
+    const { user } = await payload.auth({ headers: requestHeaders })
+
+    if (!user) {
+      return new Response('Action forbidden.', { status: 403 })
+    }
+
     // Create a Payload request object to pass to the Local API for transactions
     // At this point you should pass in a user, locale, and any other context you need for the Local API
     const payloadReq = await createLocalReq({ user }, payload)
@@ -43,10 +48,10 @@ export async function POST(): Promise<Response> {
 
     return Response.json({ success: true })
   } catch (e) {
-    payload.logger.error({ err: e, message: 'Error seeding data' })
+    payload?.logger?.error({ err: e, message: 'Error seeding data' })
     // Endpoint is authenticated (admin-only), so returning the cause is safe and
-    // makes setup problems (e.g. media storage) diagnosable without digging
-    // through server logs.
+    // makes setup problems (e.g. media storage, DB connectivity) diagnosable
+    // without digging through server logs.
     return new Response(`Error seeding data: ${describeError(e)}`, { status: 500 })
   }
 }

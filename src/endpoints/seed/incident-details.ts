@@ -48,11 +48,41 @@ export const INCIDENT = {
    * mailbox set up specifically for this incident (not personal contacts).
    */
   phone: '930-410-6815',
+
+  /**
+   * PRIVATE inbox. This is where contact-form submissions are delivered. It is
+   * NEVER printed on the public site — visitors only get a "click to email"
+   * link, and that link points at `publicEmail` below.
+   */
   email: 'arielleshrugged@proton.me',
+
+  /**
+   * PUBLIC-facing address used for the "Email the incident team" link. Set this
+   * to a forwarding alias on a domain you control (e.g. incident@yourdomain,
+   * forwarded to the private inbox via Proton custom-domain aliases or a free
+   * service like Cloudflare Email Routing) so the real inbox is never exposed.
+   * If left blank, the link falls back to the private address.
+   *
+   * Set to an alias on breachnoticevaloanlady.com. You must create the
+   * forwarding rule (Cloudflare Email Routing or Proton custom-domain alias)
+   * so mail to this address is delivered to the private Proton inbox above.
+   */
+  publicEmail: 'incident@breachnoticevaloanlady.com',
 } as const
 
 export const hasPhone = (): boolean => INCIDENT.phone.trim().length > 0
 export const hasEmail = (): boolean => INCIDENT.email.trim().length > 0
+
+/** The address shown/linked publicly — the alias if set, else the inbox. */
+export const publicEmailAddress = (): string =>
+  (INCIDENT.publicEmail.trim() || INCIDENT.email).trim()
+
+/** `mailto:` href for the click-to-email link, with a helpful default subject. */
+export const emailHref = (): string =>
+  `mailto:${publicEmailAddress()}?subject=${encodeURIComponent('Data security incident inquiry')}`
+
+/** Label for the click-to-email link/button. */
+export const EMAIL_LINK_LABEL = 'Email the incident team'
 
 /**
  * Default "From" address for outgoing notification email.
@@ -95,12 +125,10 @@ export const contactChannelNodes = (): LexicalNode[] => {
       children.push(text('Telephone: '), bold(INCIDENT.phone))
     }
     if (phone && email) {
-      children.push(text(' — Email: '))
-    } else if (email) {
-      children.push(text('Email: '))
+      children.push(text(' — '))
     }
     if (email) {
-      children.push(bold(INCIDENT.email))
+      children.push(link(emailHref(), EMAIL_LINK_LABEL))
     }
     return children
   }
@@ -123,8 +151,8 @@ export const contactChannelSentence = (): LexicalNode[] => {
     return [
       text('Call the dedicated incident line at '),
       bold(INCIDENT.phone),
-      text(', email '),
-      bold(INCIDENT.email),
+      text(', '),
+      link(emailHref(), EMAIL_LINK_LABEL),
       text(', or use the '),
       link('/contact', 'contact page'),
       text('.'),
@@ -141,8 +169,7 @@ export const contactChannelSentence = (): LexicalNode[] => {
   }
   if (email) {
     return [
-      text('Email the dedicated incident address at '),
-      bold(INCIDENT.email),
+      link(emailHref(), EMAIL_LINK_LABEL),
       text(' or use the '),
       link('/contact', 'contact page'),
       text('.'),
