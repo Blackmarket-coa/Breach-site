@@ -1,14 +1,15 @@
 import { getServerSideSitemap } from 'next-sitemap'
 import { unstable_cache } from 'next/cache'
 import { getPayloadClient } from '@/utilities/getPayloadClient'
+import { getServerSideURL } from '@/utilities/getURL'
 
 const getPagesSitemap = unstable_cache(
   async () => {
     const payload = await getPayloadClient()
-    const SITE_URL =
-      process.env.NEXT_PUBLIC_SERVER_URL ||
-      process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-      'https://example.com'
+    // Shared resolver: it prefixes the Vercel host with https:// (that variable
+    // is a bare hostname) and falls back to the canonical domain, so sitemap
+    // <loc> values are always absolute and correctly scoped.
+    const SITE_URL = getServerSideURL()
 
     const results = await payload.find({
       collection: 'pages',

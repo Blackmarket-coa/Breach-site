@@ -1,3 +1,6 @@
+import { getServerSideURL } from '@/utilities/getURL'
+import { CANONICAL_DOMAIN } from '@/utilities/siteMetadata'
+
 import { bold, link, text, type LexicalNode } from './lexical'
 
 /**
@@ -94,13 +97,9 @@ export const EMAIL_LINK_LABEL = 'Email the incident team'
  * EMAIL_FROM_ADDRESS. The Proton inbox stays the *recipient* of submissions.
  */
 export const defaultFromAddress = (): string => {
-  const serverUrl =
-    process.env.NEXT_PUBLIC_SERVER_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : 'http://localhost:3000')
+  const serverUrl = getServerSideURL()
 
-  let host = 'localhost'
+  let host = CANONICAL_DOMAIN
   try {
     host = new URL(serverUrl).hostname
   } catch {

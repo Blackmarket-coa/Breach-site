@@ -94,13 +94,13 @@ Any Docker host works; [Fly.io](https://fly.io) is the concrete example. (Altern
      PAYLOAD_SECRET="$(openssl rand -hex 32)" \
      CRON_SECRET="$(openssl rand -hex 24)" \
      PREVIEW_SECRET="$(openssl rand -hex 24)" \
-     NEXT_PUBLIC_SERVER_URL='https://your-domain.example' \
+     NEXT_PUBLIC_SERVER_URL='https://breachnoticevaloanlady.com' \
      NEXT_PUBLIC_TURNSTILE_SITE_KEY='...' \
      TURNSTILE_SECRET_KEY='...' \
      RESEND_API_KEY='...' \
-     EMAIL_FROM_ADDRESS='notifications@your-domain.example' \
+     EMAIL_FROM_ADDRESS='notifications@breachnoticevaloanlady.com' \
      EMAIL_FROM_NAME='Incident Response Team' \
-     ADMIN_NOTIFICATION_EMAIL='you@your-domain.example'
+     ADMIN_NOTIFICATION_EMAIL='you@breachnoticevaloanlady.com'
    ```
 
 4. The build stage needs database access (Next.js statically generates pages from Payload). Pass build args on deploy:
@@ -109,20 +109,22 @@ Any Docker host works; [Fly.io](https://fly.io) is the concrete example. (Altern
    fly deploy \
      --build-arg DATABASE_URL='postgresql://...' \
      --build-arg PAYLOAD_SECRET='<same as secret>' \
-     --build-arg NEXT_PUBLIC_SERVER_URL='https://your-domain.example' \
+     --build-arg NEXT_PUBLIC_SERVER_URL='https://breachnoticevaloanlady.com' \
      --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY='...'
    ```
 
 5. **Media persistence:** serverless/container filesystems are ephemeral, and uploads default to `public/media` on disk. `@payloadcms/storage-s3` is already wired in (`src/plugins`) and activates automatically when the five `S3_*` variables below are set — otherwise media falls back to local disk (fine for local dev, not for Vercel/Fly). Configure Supabase Storage:
    - In Supabase: **Storage → Create bucket** (e.g. `media`; it can stay **private** — files are served through Payload, not the bucket's public URL), then **Storage → S3 Connection / Settings → S3 access keys → New access key**.
    - Set `S3_BUCKET`, `S3_REGION` (the project's region, e.g. `us-east-1`), `S3_ENDPOINT` (`https://<project-ref>.supabase.co/storage/v1/s3`), `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`. On Vercel add them to the project env and redeploy.
-   - **Client-side uploads / CORS:** the adapter uses `clientUploads` so the browser PUTs files **directly** to the bucket via a presigned URL — Vercel caps function request bodies at 4.5 MB, so routing uploads (including official-notice PDFs) through the app would reject larger files. Because the upload is a cross-origin browser request, the bucket must allow **CORS** from the site origin: allowed origin = your site URL (e.g. `https://your-domain.example`), methods `PUT, POST, GET, HEAD`, headers `*`. Supabase Storage endpoints are permissive by default; if the admin reports a CORS error on upload, add your origin under the project's Storage/API CORS settings. (Uploads under 4.5 MB would still work server-side, but with `clientUploads` on, all uploads go direct — so the CORS rule must be in place.)
+   - **Client-side uploads / CORS:** the adapter uses `clientUploads` so the browser PUTs files **directly** to the bucket via a presigned URL — Vercel caps function request bodies at 4.5 MB, so routing uploads (including official-notice PDFs) through the app would reject larger files. Because the upload is a cross-origin browser request, the bucket must allow **CORS** from the site origin: allowed origin = your site URL (e.g. `https://breachnoticevaloanlady.com`), methods `PUT, POST, GET, HEAD`, headers `*`. Supabase Storage endpoints are permissive by default; if the admin reports a CORS error on upload, add your origin under the project's Storage/API CORS settings. (Uploads under 4.5 MB would still work server-side, but with `clientUploads` on, all uploads go direct — so the CORS rule must be in place.)
    - Alternatives: the same `S3_*` variables point at any S3-compatible store (Cloudflare R2, AWS S3); on Fly you can instead mount a volume at the media path (`fly volumes create`).
 
 ## 3. Cloudflare (domain, HTTPS, WAF, Turnstile)
 
-1. Buy/transfer the domain, add the site to Cloudflare, and point the domain's nameservers at Cloudflare.
-2. **DNS:** create a `CNAME` (or `A`) record for the apex/`www` pointing at the host (e.g. `your-app.fly.dev`), with proxy status **Proxied** (orange cloud).
+The canonical domain is **`breachnoticevaloanlady.com`** (apex, no `www`). It is the value of `NEXT_PUBLIC_SERVER_URL` in production and the fallback baked into the app via `CANONICAL_DOMAIN` in `src/utilities/siteMetadata.ts` — change it in both that file and `next-sitemap.config.cjs` if the domain ever moves.
+
+1. Buy/transfer `breachnoticevaloanlady.com`, add the site to Cloudflare, and point the domain's nameservers at Cloudflare.
+2. **DNS:** create a `CNAME` (or `A`) record for the apex **and** for `www` pointing at the host (e.g. `your-app.fly.dev`), with proxy status **Proxied** (orange cloud). Both must resolve — the app answers `www` with a permanent redirect to the apex (`redirects.ts`), so the record has to exist for that redirect to be reachable.
 3. **SSL/TLS:** set encryption mode to **Full (strict)**. Enable **Always Use HTTPS**. (The app also sends HSTS; you can additionally enable HSTS at the edge under SSL/TLS → Edge Certificates.)
 4. **DNSSEC:** enable it under DNS → Settings.
 5. **WAF:** enable the free managed ruleset (Security → WAF) and Bot Fight Mode (Security → Bots).
@@ -135,21 +137,21 @@ Any Docker host works; [Fly.io](https://fly.io) is the concrete example. (Altern
 
 1. Create a [Resend](https://resend.com) account and add your sending domain.
 2. Add the DNS records Resend provides (SPF, DKIM, and a DMARC TXT record) in Cloudflare DNS. Wait for verification.
-3. Create an API key → `RESEND_API_KEY`. Set `EMAIL_FROM_ADDRESS` to an address on the verified domain (e.g. `notifications@your-domain.example`) and `ADMIN_NOTIFICATION_EMAIL` to wherever contact-form notifications should go.
+3. Create an API key → `RESEND_API_KEY`. Set `EMAIL_FROM_ADDRESS` to an address on the verified domain (e.g. `notifications@breachnoticevaloanlady.com`) and `ADMIN_NOTIFICATION_EMAIL` to wherever contact-form notifications should go.
 4. Note: the dedicated public-facing incident inbox (the address posted on the site) is separate — create it with your mail provider and update the Contact/Notice pages in the admin panel.
 
 ## 5. Go-live checklist
 
 | Step | How |
 | --- | --- |
-| First admin account | Visit `https://your-domain/admin` once — Payload prompts to create the first user. Use a strong unique password + a password manager. |
-| Seed initial content | Log into the admin, then `POST https://your-domain/next/seed` with your session (e.g. from the browser console: `fetch('/next/seed', { method: 'POST' })`). |
+| First admin account | Visit `https://breachnoticevaloanlady.com/admin` once — Payload prompts to create the first user. Use a strong unique password + a password manager. |
+| Seed initial content | Log into the admin, then `POST https://breachnoticevaloanlady.com/next/seed` with your session (e.g. from the browser console: `fetch('/next/seed', { method: 'POST' })`). |
 | Replace ALL placeholders | Every `[BRACKETED]` passage in the seeded pages is placeholder text — replace with your reviewed statement (coordinate with the investigating agency) before announcing the site. |
 | Post the real contact channels | Update the phone number/email placeholders on the Contact page and Security Notice once the dedicated line and inbox exist. |
 | Upload the official notice PDF | Admin → Media (PDFs are allowed), then link it from the Security Notice page. |
-| Verify security headers | `curl -I https://your-domain/` — expect CSP, HSTS, nosniff, referrer-policy. `curl -I https://your-domain/admin` — expect `X-Robots-Tag: noindex`. |
+| Verify security headers | `curl -I https://breachnoticevaloanlady.com/` — expect CSP, HSTS, nosniff, referrer-policy. `curl -I https://breachnoticevaloanlady.com/admin` — expect `X-Robots-Tag: noindex`. |
 | Verify the form | Submit the contact form; confirm the Turnstile widget renders, the submission appears in Admin → Form Submissions, and the notification email arrives. |
-| Uptime monitoring | Point a free monitor (e.g. UptimeRobot, or Fly checks) at `https://your-domain/`. Cloudflare Analytics covers traffic anomalies. |
+| Uptime monitoring | Point a free monitor (e.g. UptimeRobot, or Fly checks) at `https://breachnoticevaloanlady.com/`. Cloudflare Analytics covers traffic anomalies. |
 | Backups sanity | Confirm Supabase backups are running; export one manually and store it safely. |
 
 ### Environment variable reference
