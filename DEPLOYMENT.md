@@ -154,6 +154,29 @@ The canonical domain is **`breachnoticevaloanlady.com`** (apex, no `www`). It is
 | Uptime monitoring | Point a free monitor (e.g. UptimeRobot, or Fly checks) at `https://breachnoticevaloanlady.com/`. Cloudflare Analytics covers traffic anomalies. |
 | Backups sanity | Confirm Supabase backups are running; export one manually and store it safely. |
 
+## 6. Locked out of the admin panel
+
+`scripts/admin-recovery.ts` recovers an admin account without the reset email. Run it wherever `DATABASE_URL` and `PAYLOAD_SECRET` are set to the values the deployed app uses (locally with a `.env`, or `fly ssh console` / `vercel env pull`):
+
+```bash
+npx payload run scripts/admin-recovery.ts list                  # forgot which email? this lists them
+npx payload run scripts/admin-recovery.ts reset <email>         # set a new password, clears lockout
+npx payload run scripts/admin-recovery.ts unlock <email>        # clear a lockout, keep the password
+npx payload run scripts/admin-recovery.ts create <email>        # no accounts exist at all
+npx payload run scripts/admin-recovery.ts test-email <address>  # is outbound email working?
+```
+
+The password is read from `NEW_PASSWORD`, or prompted for with the input hidden, so it never lands in shell history. `reset` goes through Payload's own hashing — **never write the `hash`/`salt` columns by hand.**
+
+**Locked out after several wrong guesses?** The Users collection sets `maxLoginAttempts: 5` and `lockTime: 10 minutes` (`src/collections/Users/index.ts`). While an account is locked, *even the correct password is rejected* with a "too many failed login attempts" message. Either wait 10 minutes or run `unlock`.
+
+**Reset email never arrives?** In order of likelihood:
+
+1. **`RESEND_API_KEY` is unset.** Payload is then configured with no email adapter at all (`src/payload.config.ts`) and writes mail to the server log instead of sending it. Nothing reaches your inbox. Check the app logs for the reset link, or use `reset` above.
+2. **`EMAIL_FROM_ADDRESS` is on a domain not verified in Resend.** Resend rejects the send. A free-mail address (e.g. `@proton.me`) will never send — the From address must be on your own verified domain. Check the Resend dashboard's log for rejected sends.
+3. **Rate limited.** `src/middleware.ts` caps `/api/users/forgot-password` at 3 requests per 15 minutes per IP; further attempts get a 429 and no email. Wait it out.
+4. **Wrong address.** Payload deliberately returns success for an unknown email so the form can't be used to discover which addresses exist — a "check your inbox" message does not mean the account exists. Confirm with `list`.
+
 ### Environment variable reference
 
 | Variable | Purpose | Build-time? |
