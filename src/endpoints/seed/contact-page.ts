@@ -82,7 +82,7 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
               ),
               paragraph(
                 text(
-                  'If you believe you are a victim of identity theft, also see the resources page for the FTC and North Carolina Attorney General reporting channels.',
+                  'If you believe you are a victim of identity theft, also see the resources page for the FTC and state Attorney General reporting channels.',
                 ),
               ),
             ),

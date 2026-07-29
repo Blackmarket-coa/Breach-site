@@ -33,9 +33,13 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
             heading('h2', text('What Happened')),
             paragraph(
               text(
-                'Beginning in or around 2019, an unauthorized party gained access to systems and accounts associated with this business and used that access, and the identity of the business owner, without authorization. The unauthorized activity continued until it was discovered in February 2026. Upon discovery, the matter was reported to law enforcement and is now under active investigation by ',
+                `Beginning in or around ${INCIDENT.breachBegan}, an unauthorized party gained access to devices, systems, and accounts used in connection with this work and used that access, and the identity of the business owner, without authorization. The incident was discovered in ${INCIDENT.discovered}. Unauthorized activity associated with the incident has continued to be identified through ${INCIDENT.activityIdentifiedThrough}. The matter has been reported to law enforcement and remains under investigation.`,
               ),
-              text(INCIDENT.investigatingAgency + '.'),
+            ),
+            paragraph(
+              text(
+                'The affected hardware included both business and personal devices used in connection with that work, along with a personal email account that was also compromised. An earlier description of this incident referred only to business hardware; the investigation has since shown that the unauthorized access was broader than that, and this notice reflects the corrected description. The full extent of the access across specific devices remains under investigation.',
+              ),
             ),
 
             heading('h2', text('Unauthorized Cryptocurrency Activity')),
@@ -58,10 +62,22 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
               ),
             ),
 
+            heading('h2', text('Who Is Affected')),
+            paragraph(
+              text(
+                `Based on current estimates, ${INCIDENT.affectedCountApprox} individuals are potentially affected. Many affected individuals did not state their state of residence when they provided their information, so residency cannot be determined from available records for a substantial number of them. For that reason, this notice is addressed to all potentially affected individuals regardless of where they live, and it should not be read as limited to the residents of any one state.`,
+              ),
+            ),
+
             heading('h2', text('What We Are Doing')),
             paragraph(
               text(
-                `The business has taken steps to protect personal information from further unauthorized access, including securing affected accounts and systems, reporting the matter to law enforcement, cooperating fully with the investigating agency, notifying affected individuals, notifying the appropriate consumer protection authorities in ${INCIDENT.statesFiledCount} states, and establishing this website and a dedicated contact channel where affected individuals can obtain information and assistance.`,
+                `Steps have been taken to protect personal information from further unauthorized access, including securing and replacing affected devices, securing affected accounts and systems, reporting the matter to law enforcement and cooperating with that process, notifying affected individuals, notifying the appropriate consumer protection authorities in ${INCIDENT.statesFiledCount} states, and establishing this website and a dedicated contact channel where affected individuals can obtain information and assistance.`,
+              ),
+            ),
+            paragraph(
+              text(
+                `The ${INCIDENT.recordOwnerCount} companies that own the affected loan records are being notified separately, as required by ${INCIDENT.statuteFull}(b).`,
               ),
             ),
 
@@ -104,18 +120,14 @@ export const securityNoticePage: RequiredDataFromCollectionSlug<'pages'> = {
                 'You can obtain information from the Federal Trade Commission and from your state Attorney General’s office about steps you can take to prevent identity theft. Notice of this incident has been provided to the appropriate consumer protection authorities in ',
               ),
               text(String(INCIDENT.statesFiledCount)),
-              text(' states.'),
+              text(
+                ' states. Those offices are not handling inquiries about this incident. For questions about this notice, please use the incident contact channel above rather than contacting a state Attorney General’s office.',
+              ),
             ),
             paragraph(
               bold('Federal Trade Commission'),
               text(
                 ' — Consumer Response Center, 600 Pennsylvania Avenue NW, Washington, DC 20580 — 1-877-438-4338 (1-877-IDTHEFT) — ftc.gov / identitytheft.gov',
-              ),
-            ),
-            paragraph(
-              bold('North Carolina Department of Justice (lead investigating agency)'),
-              text(
-                ' — Consumer Protection Division, 9001 Mail Service Center, Raleigh, NC 27699-9001 — 1-877-566-7226 (1-877-5-NO-SCAM) — ncdoj.gov',
               ),
             ),
             paragraph(
