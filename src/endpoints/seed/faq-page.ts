@@ -1,6 +1,6 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
-import { contactChannelSentence } from './incident-details'
+import { INCIDENT, contactChannelSentence } from './incident-details'
 import { heading, link, paragraph, root, text } from './lexical'
 
 export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
@@ -27,7 +27,7 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
           answer: root(
             paragraph(
               text(
-                'You may be affected if you were a client of the business at any time between 2019 and February 2026, the period during which the unauthorized activity took place. The investigation is still determining the full scope of who and what was affected. If you were a prior client during that period, you should treat yourself as potentially affected and follow the steps on our ',
+                `You may be affected if you were a client of the business at any time between ${INCIDENT.breachBegan} and ${INCIDENT.activityIdentifiedThrough}, the period during which the unauthorized activity took place. Based on current estimates, ${INCIDENT.affectedCountApprox} individuals are potentially affected, and the investigation is still determining the full scope of who and what was affected. Many affected individuals did not state their state of residence when they provided their information, so this notice is addressed to potentially affected individuals wherever they live. If you were a prior client during that period, you should treat yourself as potentially affected and follow the steps on our `,
               ),
               link('/resources', 'resources page'),
               text('.'),
@@ -61,7 +61,7 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
           answer: root(
             paragraph(
               text(
-                'The matter is under active investigation by the North Carolina Department of Justice, which is the lead agency. Notice of the incident has also been provided to the appropriate consumer protection authorities in 47 states, and additional investigations may be opened as that process continues.',
+                `The matter has been reported to law enforcement and remains under investigation. Notice of the incident has also been provided to the appropriate consumer protection authorities in ${INCIDENT.statesFiledCount} states, and additional investigations may be opened as that process continues. Those offices are not handling inquiries about this incident — please direct questions to the incident contact channel on this site.`,
               ),
             ),
           ),
@@ -71,11 +71,11 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
           answer: root(
             paragraph(
               text(
-                'Possibly. Although the North Carolina Department of Justice is the lead investigating agency, notice of this incident has been filed in 47 states, and prior clients in many states may be affected. Regardless of where you live, you can follow the steps on our ',
+                `Possibly. Notice of this incident has been filed in ${INCIDENT.statesFiledCount} states, and prior clients in many states may be affected. Because many affected individuals did not state their state of residence when they provided their information, this notice is not limited to the residents of any one state. Regardless of where you live, you can follow the steps on our `,
               ),
               link('/resources', 'resources page'),
               text(
-                ' and contact your own state Attorney General’s office. A directory of every state Attorney General is available from the National Association of Attorneys General at naag.org/find-my-ag.',
+                ` and contact your own state Attorney General’s office for general identity-theft guidance. A directory of every state Attorney General is available from the National Association of Attorneys General at ${INCIDENT.naagDirectoryUrl}. For questions about this incident specifically, please use the contact channel on this site.`,
               ),
             ),
           ),
@@ -86,7 +86,7 @@ export const faqPage: RequiredDataFromCollectionSlug<'pages'> = {
             paragraph(
               text('Yes. New information is posted on the '),
               link('/updates', 'Investigation Updates'),
-              text(' page as it becomes available and as the investigating agency permits.'),
+              text(' page as it becomes available and as the ongoing investigation permits.'),
             ),
           ),
         },

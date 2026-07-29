@@ -1,3 +1,6 @@
+import { getServerSideURL } from '@/utilities/getURL'
+import { CANONICAL_DOMAIN } from '@/utilities/siteMetadata'
+
 import { bold, link, text, type LexicalNode } from './lexical'
 
 /**
@@ -23,17 +26,56 @@ export const INCIDENT = {
 
   /** Date the notice was first posted and last substantively updated. */
   postedDate: 'July 19, 2026',
-  lastUpdated: 'July 19, 2026',
+  lastUpdated: 'July 28, 2026',
 
-  /** Investigating agency (lead). */
-  investigatingAgency: 'the North Carolina Department of Justice',
+  /** When the unauthorized access is believed to have begun. */
+  breachBegan: 'May 2019',
+
+  /** When the incident was discovered. */
+  discovered: 'March 2025',
+
+  /**
+   * Through when unauthorized activity associated with the incident has
+   * continued to be identified. This is later than `discovered` — the activity
+   * did not stop at discovery.
+   */
+  activityIdentifiedThrough: 'February 2026',
+
+  /**
+   * Approximate number of potentially affected individuals. Residency cannot be
+   * determined from available records for a substantial share of them, because
+   * many did not state their state of residence when they provided their
+   * information — so the notice is addressed to affected individuals generally
+   * rather than to any single state's residents.
+   */
+  affectedCountApprox: 'more than 1,000',
+
+  /**
+   * Companies that own the affected loan records, notified under
+   * N.C. Gen. Stat. § 75-65(b).
+   */
+  recordOwnerCount: 'eight',
 
   /**
    * Number of U.S. states where breach notice has been filed. The notice is
-   * posted under applicable state data breach notification laws generally,
-   * with North Carolina as the lead jurisdiction (NCDOJ is investigating).
+   * posted under applicable state data breach notification laws generally.
    */
   statesFiledCount: 47,
+
+  /**
+   * IMPORTANT — point-of-contact policy.
+   *
+   * The North Carolina Department of Justice has asked in writing not to be
+   * named as a point of contact for this incident, and that other states
+   * direct their questions to the person publishing this notice rather than to
+   * that office. So no state authority is listed anywhere on this site as a
+   * contact for this matter: the fact that notice was *filed* with them is
+   * stated, but every "where do I get help" path points at the dedicated
+   * incident channel, and the only Attorney General guidance offered is the
+   * generic "contact your own state's office" pointer via the NAAG directory
+   * below. Do not reintroduce a named agency contact for this incident.
+   */
+  pointOfContactPolicy: 'State authorities are not listed as points of contact for this incident.',
 
   /**
    * National Association of Attorneys General consumer directory — the
@@ -94,13 +136,9 @@ export const EMAIL_LINK_LABEL = 'Email the incident team'
  * EMAIL_FROM_ADDRESS. The Proton inbox stays the *recipient* of submissions.
  */
 export const defaultFromAddress = (): string => {
-  const serverUrl =
-    process.env.NEXT_PUBLIC_SERVER_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : 'http://localhost:3000')
+  const serverUrl = getServerSideURL()
 
-  let host = 'localhost'
+  let host = CANONICAL_DOMAIN
   try {
     host = new URL(serverUrl).hostname
   } catch {

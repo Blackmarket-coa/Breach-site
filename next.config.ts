@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
+import { CANONICAL_SITE_URL } from './src/utilities/siteMetadata'
 
 // Fail fast on misconfigured builds: `next build` statically generates pages by
 // querying Payload, so these must be present at build time — otherwise the build
@@ -22,9 +23,15 @@ if (process.argv.includes('build')) {
   }
 }
 
-const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
+// Kept in the same precedence order as getServerSideURL(). NEXT_PUBLIC_SERVER_URL
+// must come first: on a non-Vercel host (Docker/Fly) it is the only variable
+// carrying the real origin, and omitting it left `remotePatterns` allowing just
+// localhost — so the deployed site's own media URLs failed image optimization.
+const NEXT_PUBLIC_SERVER_URL =
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000')
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -96,16 +103,17 @@ const nextConfig: NextConfig = {
       },
     ],
     qualities: [100],
-    remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
-        const url = new URL(item)
+    // The canonical domain is always allowed alongside whatever origin this
+    // build resolved to, so media URLs stored against the public domain still
+    // optimize on preview/staging builds pointed elsewhere.
+    remotePatterns: [...new Set([NEXT_PUBLIC_SERVER_URL, CANONICAL_SITE_URL])].map((item) => {
+      const url = new URL(item)
 
-        return {
-          hostname: url.hostname,
-          protocol: url.protocol.replace(':', '') as 'http' | 'https',
-        }
-      }),
-    ],
+      return {
+        hostname: url.hostname,
+        protocol: url.protocol.replace(':', '') as 'http' | 'https',
+      }
+    }),
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
