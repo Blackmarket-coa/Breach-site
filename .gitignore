@@ -2,7 +2,12 @@ build
 dist / media
 node_modules
 .DS_Store
+# Every local env file. `vercel env pull` writes .env.local by default, which
+# holds production secrets (DATABASE_URL, PAYLOAD_SECRET, S3 keys) — the bare
+# `.env` pattern did not cover it. .env.example is checked in deliberately.
 .env
+.env.*
+!.env.example
 .next
 next-env.d.ts
 .vercel
