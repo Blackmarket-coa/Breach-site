@@ -15,6 +15,10 @@ next-env.d.ts
 # Payload default media upload directory
 public/media/
 
+# Local fallback for private request-document uploads (when S3_PRIVATE_BUCKET is
+# unset). These files are submitted by the public and may hold personal data.
+.private-uploads/
+
 public/robots.txt
 public/sitemap*.xml
 
