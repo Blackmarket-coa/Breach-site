@@ -128,8 +128,19 @@ The canonical domain is **`breachnoticevaloanlady.com`** (apex, no `www`). It is
 2. **DNS:** create a `CNAME` (or `A`) record for the apex **and** for `www` pointing at the host (e.g. `your-app.fly.dev`), with proxy status **Proxied** (orange cloud). Both must resolve — the app answers `www` with a permanent redirect to the apex (`redirects.ts`), so the record has to exist for that redirect to be reachable.
 3. **SSL/TLS:** set encryption mode to **Full (strict)**. Enable **Always Use HTTPS**. (The app also sends HSTS; you can additionally enable HSTS at the edge under SSL/TLS → Edge Certificates.)
 4. **DNSSEC:** enable it under DNS → Settings.
-5. **WAF:** enable the free managed ruleset (Security → WAF) and Bot Fight Mode (Security → Bots).
-6. **Rate-limiting rules** (Security → WAF → Rate limiting rules) as the production-grade layer in front of the app's own middleware:
+5. **WAF:** enable the free managed ruleset (Security → WAF) and Bot Fight Mode (Security → Bots). Then add a **custom rule** (Security → WAF → Custom rules) with action **Block** for vulnerability-scanner probes. This app runs no PHP, so these requests are never legitimate, and since the October 2026 PHP2Shell disclosure every public site receives them in volume:
+
+   ```
+   (http.request.uri.path contains ".php")
+   or (http.request.uri.path contains "/wp-")
+   or (http.request.uri.path contains "/wordpress")
+   or (http.request.uri.path contains "phpmyadmin")
+   or (http.request.uri.path contains "/cgi-bin")
+   or (http.request.uri.path contains "/." and not starts_with(http.request.uri.path, "/.well-known/"))
+   ```
+
+   The app already answers these with an immediate 404 from `src/proxy.ts` without touching the database; the edge rule stops them before they cost a request at the host at all. (On Vercel without the Cloudflare proxy, add the equivalent rule under the project's Firewall settings.)
+6. **Rate-limiting rules** (Security → WAF → Rate limiting rules) as the production-grade layer in front of the app's own rate limiting (`src/proxy.ts`):
    - `POST /api/form-submissions` — e.g. 5 requests per 10 minutes per IP → block.
    - `POST /api/users/login` — e.g. 10 requests per 15 minutes per IP → block.
 7. **Turnstile:** Cloudflare dashboard → Turnstile → Add widget for your domain (Managed mode). Copy the **site key** into `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (build arg + secret) and the **secret key** into `TURNSTILE_SECRET_KEY`, then redeploy. Until these are set, the form renders without the widget and the server skips verification (with a logged warning) — do not run production that way.
@@ -175,7 +186,7 @@ The password is read from `NEW_PASSWORD`, or prompted for with the input hidden,
 
 1. **`RESEND_API_KEY` is unset.** Payload is then configured with no email adapter at all (`src/payload.config.ts`) and writes mail to the server log instead of sending it. Nothing reaches your inbox. Check the app logs for the reset link, or use `reset` above.
 2. **`EMAIL_FROM_ADDRESS` is on a domain not verified in Resend.** Resend rejects the send. A free-mail address (e.g. `@proton.me`) will never send — the From address must be on your own verified domain. Check the Resend dashboard's log for rejected sends.
-3. **Rate limited.** `src/middleware.ts` caps `/api/users/forgot-password` at 3 requests per 15 minutes per IP; further attempts get a 429 and no email. Wait it out.
+3. **Rate limited.** `src/proxy.ts` caps `/api/users/forgot-password` at 3 requests per 15 minutes per IP; further attempts get a 429 and no email. Wait it out.
 4. **Wrong address.** Payload deliberately returns success for an unknown email so the form can't be used to discover which addresses exist — a "check your inbox" message does not mean the account exists. Confirm with `list`.
 
 ### Environment variable reference

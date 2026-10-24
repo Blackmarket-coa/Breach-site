@@ -34,10 +34,12 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 // no CSP img-src changes needed); the bucket can stay private. Without these
 // env vars — local dev and CI — media falls back to local disk unchanged.
 //
-// NOTE: this plugin (with clientUploads) registers an admin component
-// (S3ClientUploadHandler). The committed admin import map therefore MUST include
-// it, or the admin panel fails to render in production. Regenerate the import
-// map with the S3_* vars set: `S3_BUCKET=… … pnpm generate:importmap`.
+// The storage plugins below are always registered and switched on or off with
+// `enabled`, never added conditionally. With `alwaysInsertFields` they add their
+// columns (`prefix`, `_objectKey`) even while disabled, so the database schema,
+// generated types and admin import map are the same in local dev, CI and
+// production. When the plugins were only registered with the S3_* vars set, a
+// migration generated without them silently omitted columns production needs.
 const s3StorageConfigured = Boolean(
   process.env.S3_BUCKET &&
     process.env.S3_REGION &&
@@ -124,56 +126,52 @@ export const plugins: Plugin[] = [
       },
     },
   }),
-  ...(s3StorageConfigured
-    ? [
-        s3Storage({
-          collections: {
-            media: true,
-          },
-          // Upload straight from the browser to S3 via a presigned URL. Vercel
-          // caps function request bodies at 4.5 MB, so routing uploads through
-          // Payload would reject larger files — and this collection allows PDFs
-          // (official notices) that can exceed that. Presigned uploads are
-          // gated to authenticated users by default (matches Media's create
-          // access). Requires the bucket to allow CORS from the site origin.
-          clientUploads: true,
-          bucket: process.env.S3_BUCKET,
-          config: {
-            endpoint: process.env.S3_ENDPOINT,
-            region: process.env.S3_REGION,
-            // Supabase Storage's S3 endpoint requires path-style addressing.
-            forcePathStyle: true,
-            credentials: {
-              accessKeyId: process.env.S3_ACCESS_KEY_ID,
-              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-            },
-          },
-        }),
-      ]
-    : []),
+  s3Storage({
+    enabled: s3StorageConfigured,
+    alwaysInsertFields: true,
+    collections: {
+      media: true,
+    },
+    // Upload straight from the browser to S3 via a presigned URL. Vercel
+    // caps function request bodies at 4.5 MB, so routing uploads through
+    // Payload would reject larger files — and this collection allows PDFs
+    // (official notices) that can exceed that. Presigned uploads are
+    // gated to authenticated users by default (matches Media's create
+    // access). Requires the bucket to allow CORS from the site origin.
+    clientUploads: true,
+    bucket: process.env.S3_BUCKET,
+    config: {
+      endpoint: process.env.S3_ENDPOINT,
+      region: process.env.S3_REGION,
+      // Supabase Storage's S3 endpoint requires path-style addressing.
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      },
+    },
+  }),
   // Private uploads collection in its own PRIVATE bucket: objects use a private
   // ACL and are only ever served through short-lived signed URLs, generated
   // after Payload's admin-only access control runs. This keeps client-submitted
   // documents off the public web even though the media bucket is public.
-  ...(privateUploadsConfigured
-    ? [
-        s3Storage({
-          collections: {
-            'request-documents': true,
-          },
-          acl: 'private',
-          signedDownloads: true,
-          bucket: s3PrivateBucket as string,
-          config: {
-            endpoint: process.env.S3_ENDPOINT,
-            region: process.env.S3_REGION,
-            forcePathStyle: true,
-            credentials: {
-              accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
-              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
-            },
-          },
-        }),
-      ]
-    : []),
+  s3Storage({
+    enabled: privateUploadsConfigured,
+    alwaysInsertFields: true,
+    collections: {
+      'request-documents': true,
+    },
+    acl: 'private',
+    signedDownloads: true,
+    bucket: s3PrivateBucket as string,
+    config: {
+      endpoint: process.env.S3_ENDPOINT,
+      region: process.env.S3_REGION,
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
+      },
+    },
+  }),
 ]

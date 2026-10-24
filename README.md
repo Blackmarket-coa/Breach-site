@@ -22,7 +22,7 @@ Based on the official Payload Website Template (v3.86.0).
 
 ## Quick start (local)
 
-Requirements: Node 20+ (or 18.20+), pnpm 9+, Docker (for local Postgres).
+Requirements: Node 22.23.4+ (the `22.x` line pinned in `.nvmrc` / `engines`), pnpm 9+, Docker (for local Postgres).
 
 ```bash
 cp .env.example .env          # fill in PAYLOAD_SECRET at minimum
@@ -62,6 +62,7 @@ See [.env.example](./.env.example) for the full annotated list. Highlights:
 - Contact form: Cloudflare Turnstile verification (server-side), input size caps, per-IP rate limiting, email notification to administrators.
 - Admin: no public registration, login lockout after repeated failures, 2h session expiration, secure cookies in production, audit logging of auth events and submissions, `noindex` on `/admin`.
 - HTTP: Content-Security-Policy, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` headers set in `next.config.ts`.
+- Scanner probes (PHP/ASP scripts, dotfiles such as `/.env`, WordPress and phpMyAdmin paths) get an immediate 404 from `src/proxy.ts`, before routing and without a database query.
 - Production edge: Cloudflare WAF, rate-limiting rules, and Bot Fight Mode (see the deployment runbook).
 
 ## Deployment
@@ -97,5 +98,5 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full runbook: Supabase setup (inclu
 | `src/plugins`         | Payload plugin configuration                           |
 | `src/migrations`      | Committed database migrations                          |
 | `src/app`             | Next.js App Router routes (frontend + Payload admin)   |
-| `src/middleware.ts`   | Security headers, rate limiting                        |
+| `src/proxy.ts`        | Rate limiting, immediate 404 for scanner probes        |
 | `tests`               | Vitest integration tests and Playwright e2e tests      |
