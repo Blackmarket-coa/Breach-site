@@ -22,7 +22,7 @@ Based on the official Payload Website Template (v3.86.0).
 
 ## Quick start (local)
 
-Requirements: Node 20+ (or 18.20+), pnpm 9+, Docker (for local Postgres).
+Requirements: Node 22.23.4+ (the `22.x` line pinned in `.nvmrc` / `engines`), pnpm 9+, Docker (for local Postgres).
 
 ```bash
 cp .env.example .env          # fill in PAYLOAD_SECRET at minimum
